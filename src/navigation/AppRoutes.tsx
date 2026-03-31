@@ -57,6 +57,11 @@ import SubIdsTabs from "src/pages/SubordinateIDs/SubIdsTabs";
 import PasswordPoliciesTabs from "src/pages/PasswordPolicies/PasswordPoliciesTabs";
 import IdpReferences from "src/pages/IdPReferences/IdpReferences";
 import IdpReferencesTabs from "src/pages/IdPReferences/IdpReferencesTabs";
+import OAuth2Clients from "src/pages/OAuth2Clients/OAuth2Clients";
+import OAuth2ClientsTabs from "src/pages/OAuth2Clients/OAuth2ClientsTabs";
+import OAuth2Scopes from "src/pages/OAuth2Scopes/OAuth2Scopes";
+import OAuth2Workloads from "src/pages/OAuth2Workloads/OAuth2Workloads";
+import OAuth2Delegations from "src/pages/OAuth2Delegations/OAuth2Delegations";
 import CertificateMappingPage from "src/pages/CertificateMapping/CertificateMapping";
 import CertificateMappingGlobalConfig from "src/pages/CertificateMapping/CertificateMappingGlobalConfig";
 import CertificateMappingMatch from "src/pages/CertificateMapping/CertificateMappingMatch";
@@ -459,6 +464,24 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
                     element={<IdpReferencesTabs section="settings" />}
                   />
                 </Route>
+              </Route>
+              <Route path="oauth2-clients">
+                <Route path="" element={<OAuth2Clients />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2ClientsTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="oauth2-scopes">
+                <Route path="" element={<OAuth2Scopes />} />
+              </Route>
+              <Route path="oauth2-workloads">
+                <Route path="" element={<OAuth2Workloads />} />
+              </Route>
+              <Route path="oauth2-delegations">
+                <Route path="" element={<OAuth2Delegations />} />
               </Route>
               <Route path="cert-id-mapping-rules">
                 <Route path="" element={<CertificateMappingPage />} />
