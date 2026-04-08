@@ -55,6 +55,7 @@ const OAuth2ClientsGroupRef = "oauth2-clients";
 const OAuth2ScopesGroupRef = "oauth2-scopes";
 const OAuth2WorkloadsGroupRef = "oauth2-workloads";
 const OAuth2DelegationsGroupRef = "oauth2-delegations";
+const OAuth2VendorsGroupRef = "oauth2-vendors";
 const CertificateMappingGroupRef = "cert-id-mapping-rules";
 const CertificateMappingConfigGroupRef = "cert-id-mapping-global-config";
 const CertificateMappingMatchGroupRef = "cert-id-mapping-match";
@@ -347,21 +348,56 @@ export const getNavigationRoutes = (
               group: OAuth2ScopesGroupRef,
               title: `${BASE_TITLE} - OAuth2 scopes`,
               path: "oauth2-scopes",
-              items: [],
+              items: [
+                {
+                  label: "OAuth2 scope Settings",
+                  group: OAuth2ScopesGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-scopes/:cn",
+                },
+              ],
             },
             {
               label: "Workload identities",
               group: OAuth2WorkloadsGroupRef,
               title: `${BASE_TITLE} - Workload identities`,
               path: "oauth2-workloads",
-              items: [],
+              items: [
+                {
+                  label: "Workload identity Settings",
+                  group: OAuth2WorkloadsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-workloads/:cn",
+                },
+              ],
             },
             {
               label: "Delegation rules",
               group: OAuth2DelegationsGroupRef,
               title: `${BASE_TITLE} - Delegation rules`,
               path: "oauth2-delegations",
-              items: [],
+              items: [
+                {
+                  label: "Delegation rule Settings",
+                  group: OAuth2DelegationsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-delegations/:cn",
+                },
+              ],
+            },
+            {
+              label: "Trusted vendors",
+              group: OAuth2VendorsGroupRef,
+              title: `${BASE_TITLE} - Trusted vendors`,
+              path: "oauth2-vendors",
+              items: [
+                {
+                  label: "Trusted vendor Settings",
+                  group: OAuth2VendorsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-vendors/:cn",
+                },
+              ],
             },
           ],
         },

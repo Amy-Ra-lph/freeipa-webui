@@ -61,7 +61,12 @@ import OAuth2Clients from "src/pages/OAuth2Clients/OAuth2Clients";
 import OAuth2ClientsTabs from "src/pages/OAuth2Clients/OAuth2ClientsTabs";
 import OAuth2Scopes from "src/pages/OAuth2Scopes/OAuth2Scopes";
 import OAuth2Workloads from "src/pages/OAuth2Workloads/OAuth2Workloads";
+import OAuth2WorkloadsTabs from "src/pages/OAuth2Workloads/OAuth2WorkloadsTabs";
 import OAuth2Delegations from "src/pages/OAuth2Delegations/OAuth2Delegations";
+import OAuth2ScopesTabs from "src/pages/OAuth2Scopes/OAuth2ScopesTabs";
+import OAuth2DelegationsTabs from "src/pages/OAuth2Delegations/OAuth2DelegationsTabs";
+import OAuth2Vendors from "src/pages/OAuth2Vendors/OAuth2Vendors";
+import OAuth2VendorsTabs from "src/pages/OAuth2Vendors/OAuth2VendorsTabs";
 import CertificateMappingPage from "src/pages/CertificateMapping/CertificateMapping";
 import CertificateMappingGlobalConfig from "src/pages/CertificateMapping/CertificateMappingGlobalConfig";
 import CertificateMappingMatch from "src/pages/CertificateMapping/CertificateMappingMatch";
@@ -476,12 +481,39 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
               </Route>
               <Route path="oauth2-scopes">
                 <Route path="" element={<OAuth2Scopes />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2ScopesTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="oauth2-workloads">
                 <Route path="" element={<OAuth2Workloads />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2WorkloadsTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="oauth2-delegations">
                 <Route path="" element={<OAuth2Delegations />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2DelegationsTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="oauth2-vendors">
+                <Route path="" element={<OAuth2Vendors />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2VendorsTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="cert-id-mapping-rules">
                 <Route path="" element={<CertificateMappingPage />} />
