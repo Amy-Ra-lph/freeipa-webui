@@ -79,6 +79,52 @@ export interface OAuth2WorkloadAddPayload {
   version?: string;
 }
 
+export interface OAuth2WorkloadModPayload {
+  workloadName: string;
+  oauth2workloadtype?: string;
+  oauth2spiffeid?: string;
+  oauth2workloadowner?: string;
+  oauth2workloadclient?: string;
+  oauth2workloadserviceprincipal?: string;
+  oauth2enabled?: string;
+  oauth2maxtokenlifetime?: string;
+  description?: string;
+}
+
+export interface OAuth2VendorAddPayload {
+  cn: string;
+  oauth2vendorcacert: string;
+  oauth2vendorscope?: string[];
+  oauth2vendornotafter?: string;
+  oauth2vendorcontact?: string;
+  oauth2vendorrekorurl?: string;
+  description?: string;
+  version?: string;
+}
+
+export interface OAuth2VendorModPayload {
+  vendorName: string;
+  oauth2vendorcacert?: string;
+  oauth2vendorscope?: string[];
+  oauth2vendornotafter?: string;
+  oauth2vendorcontact?: string;
+  oauth2vendorrekorurl?: string;
+  oauth2enabled?: string;
+  description?: string;
+}
+
+export interface OAuth2DelegationModPayload {
+  delegationName: string;
+  oauth2delegatesource?: string;
+  oauth2delegatetarget?: string[];
+  oauth2delegatescope?: string[];
+  oauth2delegatehostgroup?: string[];
+  oauth2delegateservice?: string[];
+  oauth2delegatenotafter?: string;
+  oauth2enabled?: string;
+  description?: string;
+}
+
 export interface OAuth2DelegationAddPayload {
   cn: string;
   oauth2delegatesource: string;
@@ -714,6 +760,56 @@ const extendedApi = api.injectEndpoints({
       },
     }),
 
+    oauth2WorkloadShow: build.query<Record<string, unknown>, string>({
+      query: (workloadName) => {
+        return getCommand({
+          method: "oauth2workload_show",
+          params: [
+            [workloadName],
+            { all: true, rights: true, version: API_VERSION_BACKUP },
+          ],
+        });
+      },
+      transformResponse: (response: FindRPCResponse) => {
+        return response.result.result as unknown as Record<string, unknown>;
+      },
+    }),
+
+    oauth2WorkloadMod: build.mutation<FindRPCResponse, OAuth2WorkloadModPayload>({
+      query: (payload) => {
+        const params: Record<string, unknown> = {
+          all: true,
+          rights: true,
+          version: API_VERSION_BACKUP,
+        };
+
+        const optionalKeys: Array<
+          keyof Omit<OAuth2WorkloadModPayload, "workloadName">
+        > = [
+          "oauth2workloadtype",
+          "oauth2spiffeid",
+          "oauth2workloadowner",
+          "oauth2workloadclient",
+          "oauth2workloadserviceprincipal",
+          "oauth2enabled",
+          "oauth2maxtokenlifetime",
+          "description",
+        ];
+
+        optionalKeys.forEach((key) => {
+          const value = payload[key];
+          if (value !== undefined) {
+            params[key] = value;
+          }
+        });
+
+        return getCommand({
+          method: "oauth2workload_mod",
+          params: [[payload.workloadName], params],
+        });
+      },
+    }),
+
     // ====== OAuth2 Delegation endpoints ======
 
     getOAuth2DelegationEntries: build.query<
@@ -891,6 +987,279 @@ const extendedApi = api.injectEndpoints({
         return getBatchCommand(commands, API_VERSION_BACKUP);
       },
     }),
+
+    oauth2DelegationShow: build.query<Record<string, unknown>, string>({
+      query: (delegationName) => {
+        return getCommand({
+          method: "oauth2delegation_show",
+          params: [
+            [delegationName],
+            { all: true, rights: true, version: API_VERSION_BACKUP },
+          ],
+        });
+      },
+      transformResponse: (response: FindRPCResponse) => {
+        return response.result.result as unknown as Record<string, unknown>;
+      },
+    }),
+
+    oauth2DelegationMod: build.mutation<FindRPCResponse, OAuth2DelegationModPayload>({
+      query: (payload) => {
+        const params: Record<string, unknown> = {
+          all: true,
+          rights: true,
+          version: API_VERSION_BACKUP,
+        };
+
+        const optionalKeys: Array<
+          keyof Omit<OAuth2DelegationModPayload, "delegationName">
+        > = [
+          "oauth2delegatesource",
+          "oauth2delegatetarget",
+          "oauth2delegatescope",
+          "oauth2delegatehostgroup",
+          "oauth2delegateservice",
+          "oauth2delegatenotafter",
+          "oauth2enabled",
+          "description",
+        ];
+
+        optionalKeys.forEach((key) => {
+          const value = payload[key];
+          if (value !== undefined) {
+            params[key] = value;
+          }
+        });
+
+        return getCommand({
+          method: "oauth2delegation_mod",
+          params: [[payload.delegationName], params],
+        });
+      },
+    }),
+    // ====== OAuth2 Vendor endpoints ======
+
+    getOAuth2VendorEntries: build.query<
+      BatchRPCResponse,
+      OAuth2FullDataPayload
+    >({
+      async queryFn(payloadData, _queryApi, _extraOptions, fetchWithBQ) {
+        const { searchValue, apiVersion, sizelimit, startIdx, stopIdx } =
+          payloadData;
+
+        if (apiVersion === undefined) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              data: "",
+              error: "API version not available",
+            } as FetchBaseQueryError,
+          };
+        }
+
+        const findParams = {
+          pkey_only: true,
+          sizelimit: sizelimit,
+          version: apiVersion,
+        };
+
+        const payloadFind: Command = {
+          method: "oauth2vendor_find",
+          params: [[searchValue], findParams],
+        };
+
+        const getResultFind = await fetchWithBQ(getCommand(payloadFind));
+        if (getResultFind.error) {
+          return { error: getResultFind.error as FetchBaseQueryError };
+        }
+
+        const responseDataFind = getResultFind.data as FindRPCResponse;
+        const ids: string[] = [];
+        const itemsCount = responseDataFind.result.result.length as number;
+
+        for (let i = startIdx; i < itemsCount && i < stopIdx; i++) {
+          const item = responseDataFind.result.result[i] as cnType;
+          const { cn } = item;
+          ids.push(cn[0] as string);
+        }
+
+        const commands: Command[] = [];
+        ids.forEach((id) => {
+          commands.push({
+            method: "oauth2vendor_show",
+            params: [[id], {}],
+          });
+        });
+
+        const showResult = await fetchWithBQ(
+          getBatchCommand(commands, apiVersion)
+        );
+
+        const response = showResult.data as BatchRPCResponse;
+        if (response) {
+          response.result.totalCount = itemsCount;
+        }
+
+        return { data: response };
+      },
+    }),
+
+    searchOAuth2VendorEntries: build.mutation<
+      BatchRPCResponse,
+      OAuth2FullDataPayload
+    >({
+      async queryFn(payloadData, _queryApi, _extraOptions, fetchWithBQ) {
+        const { searchValue, apiVersion, sizelimit, startIdx, stopIdx } =
+          payloadData;
+
+        if (apiVersion === undefined) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              data: "",
+              error: "API version not available",
+            } as FetchBaseQueryError,
+          };
+        }
+
+        const findParams = {
+          pkey_only: true,
+          sizelimit: sizelimit,
+          version: apiVersion,
+        };
+
+        const payloadFind: Command = {
+          method: "oauth2vendor_find",
+          params: [[searchValue], findParams],
+        };
+
+        const getResultFind = await fetchWithBQ(getCommand(payloadFind));
+        if (getResultFind.error) {
+          return { error: getResultFind.error as FetchBaseQueryError };
+        }
+
+        const responseDataFind = getResultFind.data as FindRPCResponse;
+        const ids: string[] = [];
+        const itemsCount = responseDataFind.result.result.length as number;
+
+        for (let i = startIdx; i < itemsCount && i < stopIdx; i++) {
+          const item = responseDataFind.result.result[i] as cnType;
+          const { cn } = item;
+          ids.push(cn[0] as string);
+        }
+
+        const commands: Command[] = [];
+        ids.forEach((id) => {
+          commands.push({
+            method: "oauth2vendor_show",
+            params: [[id], {}],
+          });
+        });
+
+        const showResult = await fetchWithBQ(
+          getBatchCommand(commands, apiVersion)
+        );
+
+        const response = showResult.data as BatchRPCResponse;
+        if (response) {
+          response.result.totalCount = itemsCount;
+        }
+
+        return { data: response };
+      },
+    }),
+
+    oauth2VendorAdd: build.mutation<FindRPCResponse, OAuth2VendorAddPayload>({
+      query: (payload) => {
+        const params: Record<string, unknown> = {
+          oauth2vendorcacert: payload.oauth2vendorcacert,
+          version: payload.version || API_VERSION_BACKUP,
+        };
+
+        if (payload.oauth2vendorscope) {
+          params.oauth2vendorscope = payload.oauth2vendorscope;
+        }
+        if (payload.oauth2vendornotafter) {
+          params.oauth2vendornotafter = payload.oauth2vendornotafter;
+        }
+        if (payload.oauth2vendorcontact) {
+          params.oauth2vendorcontact = payload.oauth2vendorcontact;
+        }
+        if (payload.oauth2vendorrekorurl) {
+          params.oauth2vendorrekorurl = payload.oauth2vendorrekorurl;
+        }
+        if (payload.description) {
+          params.description = payload.description;
+        }
+
+        return getCommand({
+          method: "oauth2vendor_add",
+          params: [[payload.cn], params],
+        });
+      },
+    }),
+
+    oauth2VendorDelete: build.mutation<BatchRPCResponse, string[]>({
+      query: (payload) => {
+        const commands: Command[] = [];
+        payload.forEach((name) => {
+          commands.push({
+            method: "oauth2vendor_del",
+            params: [[name], {}],
+          });
+        });
+        return getBatchCommand(commands, API_VERSION_BACKUP);
+      },
+    }),
+
+    oauth2VendorShow: build.query<Record<string, unknown>, string>({
+      query: (vendorName) => {
+        return getCommand({
+          method: "oauth2vendor_show",
+          params: [
+            [vendorName],
+            { all: true, rights: true, version: API_VERSION_BACKUP },
+          ],
+        });
+      },
+      transformResponse: (response: FindRPCResponse) => {
+        return response.result.result as unknown as Record<string, unknown>;
+      },
+    }),
+
+    oauth2VendorMod: build.mutation<FindRPCResponse, OAuth2VendorModPayload>({
+      query: (payload) => {
+        const params: Record<string, unknown> = {
+          all: true,
+          rights: true,
+          version: API_VERSION_BACKUP,
+        };
+
+        const optionalKeys: Array<
+          keyof Omit<OAuth2VendorModPayload, "vendorName">
+        > = [
+          "oauth2vendorcacert",
+          "oauth2vendorscope",
+          "oauth2vendornotafter",
+          "oauth2vendorcontact",
+          "oauth2vendorrekorurl",
+          "oauth2enabled",
+          "description",
+        ];
+
+        optionalKeys.forEach((key) => {
+          const value = payload[key];
+          if (value !== undefined) {
+            params[key] = value;
+          }
+        });
+
+        return getCommand({
+          method: "oauth2vendor_mod",
+          params: [[payload.vendorName], params],
+        });
+      },
+    }),
   }),
   overrideExisting: false,
 });
@@ -913,8 +1282,18 @@ export const {
   useSearchOAuth2WorkloadEntriesMutation,
   useOauth2WorkloadAddMutation,
   useOauth2WorkloadDeleteMutation,
+  useOauth2WorkloadShowQuery,
+  useOauth2WorkloadModMutation,
   useGetOAuth2DelegationEntriesQuery,
   useSearchOAuth2DelegationEntriesMutation,
   useOauth2DelegationAddMutation,
   useOauth2DelegationDeleteMutation,
+  useOauth2DelegationShowQuery,
+  useOauth2DelegationModMutation,
+  useGetOAuth2VendorEntriesQuery,
+  useSearchOAuth2VendorEntriesMutation,
+  useOauth2VendorAddMutation,
+  useOauth2VendorDeleteMutation,
+  useOauth2VendorShowQuery,
+  useOauth2VendorModMutation,
 } = extendedApi;
