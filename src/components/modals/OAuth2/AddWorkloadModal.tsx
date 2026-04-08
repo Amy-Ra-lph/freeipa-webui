@@ -46,7 +46,7 @@ const AddOAuth2WorkloadModal = (props: PropsToAddModal) => {
   const onSubmit = () => {
     const payload: OAuth2WorkloadAddPayload = {
       cn: workloadName,
-      oauth2workloadtype: workloadType || undefined,
+      oauth2workloadtype: workloadType || "",
       oauth2spiffeid: spiffeId || undefined,
       oauth2workloadowner: owner || undefined,
       oauth2workloadserviceprincipal: servicePrincipal || undefined,

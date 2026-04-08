@@ -407,7 +407,7 @@ const OAuth2Scopes = () => {
                     hasCheckboxes={true}
                     pathname="oauth2-scopes"
                     showTableRows={showTableRows}
-                    showLink={false}
+                    showLink={true}
                     elementsData={{
                       isElementSelectable: isOAuth2ScopeSelectable,
                       selectedElements,

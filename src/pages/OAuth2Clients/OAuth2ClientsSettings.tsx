@@ -502,7 +502,7 @@ const OAuth2ClientSettings = (props: PropsToSettings) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <Button variant="primary" onClick={onCloseSecretModal}>
+          <Button data-cy="secret-modal-done" variant="primary" onClick={onCloseSecretModal}>
             Done
           </Button>
         </ModalFooter>

@@ -123,6 +123,7 @@ const HBACTest = () => {
                   <FormGroup label="User" isRequired fieldId="hbac-test-user">
                     <TextInput
                       id="hbac-test-user"
+                      data-cy="hbac-test-user"
                       value={user}
                       onChange={(_event, value) => setUser(value)}
                       type="text"
@@ -140,6 +141,7 @@ const HBACTest = () => {
                   <FormGroup label="Target host" isRequired fieldId="hbac-test-host">
                     <TextInput
                       id="hbac-test-host"
+                      data-cy="hbac-test-host"
                       value={targetHost}
                       onChange={(_event, value) => setTargetHost(value)}
                       type="text"
@@ -157,6 +159,7 @@ const HBACTest = () => {
                   <FormGroup label="Service" isRequired fieldId="hbac-test-service">
                     <TextInput
                       id="hbac-test-service"
+                      data-cy="hbac-test-service"
                       value={service}
                       onChange={(_event, value) => setService(value)}
                       type="text"
@@ -185,6 +188,7 @@ const HBACTest = () => {
 
                   <ActionGroup>
                     <Button
+                      data-cy="hbac-test-run"
                       variant="primary"
                       onClick={onRunTest}
                       isDisabled={!isFormValid || isRunning}
@@ -192,7 +196,7 @@ const HBACTest = () => {
                     >
                       Run test
                     </Button>
-                    <Button variant="link" onClick={onClear}>
+                    <Button data-cy="hbac-test-clear" variant="link" onClick={onClear}>
                       Clear
                     </Button>
                   </ActionGroup>
