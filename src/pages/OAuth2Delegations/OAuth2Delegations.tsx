@@ -409,7 +409,7 @@ const OAuth2Delegations = () => {
                     hasCheckboxes={true}
                     pathname="oauth2-delegations"
                     showTableRows={showTableRows}
-                    showLink={false}
+                    showLink={true}
                     elementsData={{
                       isElementSelectable: isOAuth2DelegationSelectable,
                       selectedElements,

@@ -411,7 +411,7 @@ const OAuth2Workloads = () => {
                     hasCheckboxes={true}
                     pathname="oauth2-workloads"
                     showTableRows={showTableRows}
-                    showLink={false}
+                    showLink={true}
                     elementsData={{
                       isElementSelectable: isOAuth2WorkloadSelectable,
                       selectedElements,
