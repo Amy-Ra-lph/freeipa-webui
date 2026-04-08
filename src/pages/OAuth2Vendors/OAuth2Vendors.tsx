@@ -52,10 +52,12 @@ interface OAuth2Vendor {
 
 // Unwrap __datetime__ and __base64__ objects returned by IPA JSON API
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const UNWRAP_FIELDS = ["oauth2vendornotafter", "oauth2vendorcacert"];
+
 const unwrapVendorSpecialTypes = (vendor: any): OAuth2Vendor => {
   const v = { ...vendor };
-  for (const key of Object.keys(v)) {
-    if (Array.isArray(v[key]) && v[key].length > 0) {
+  for (const key of UNWRAP_FIELDS) {
+    if (key in v && Array.isArray(v[key]) && v[key].length > 0) {
       if (v[key][0]?.__datetime__) {
         v[key] = [v[key][0].__datetime__];
       } else if (v[key][0]?.__base64__) {
@@ -169,7 +171,7 @@ const OAuth2Vendors = () => {
     if (isSelected) {
       newSelected = JSON.parse(JSON.stringify(selectedElements));
       for (const item of items) {
-        if (!selectedElements.find((sel) => sel.cn[0] === item.cn[0])) {
+        if (!selectedElements.find((sel) => sel.cn?.[0] === item.cn?.[0])) {
           newSelected.push(item);
         }
       }
@@ -177,7 +179,7 @@ const OAuth2Vendors = () => {
       for (const sel of selectedElements) {
         let found = false;
         for (const item of items) {
-          if (sel.cn[0] === item.cn[0]) {
+          if (sel.cn?.[0] === item.cn?.[0]) {
             found = true;
             break;
           }

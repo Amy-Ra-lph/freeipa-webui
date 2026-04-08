@@ -33,6 +33,14 @@ const AddOAuth2VendorModal = (props: PropsToAddModal) => {
   const [rekorUrl, setRekorUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
 
+  // Validation state
+  const [caCertValidated, setCaCertValidated] = React.useState<
+    "default" | "error"
+  >("default");
+  const [expiresValidated, setExpiresValidated] = React.useState<
+    "default" | "error"
+  >("default");
+
   const [addVendor] = useOauth2VendorAddMutation();
 
   const resetFields = () => {
@@ -43,6 +51,20 @@ const AddOAuth2VendorModal = (props: PropsToAddModal) => {
     setExpires("");
     setRekorUrl("");
     setDescription("");
+    setCaCertValidated("default");
+    setExpiresValidated("default");
+  };
+
+  const validateCaCert = (value: string): boolean => {
+    if (!value) return true; // required handled by isDisabled
+    return /^-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----\s*$/.test(
+      value.trim()
+    );
+  };
+
+  const validateExpires = (value: string): boolean => {
+    if (!value) return true; // optional field
+    return /^\d{14}Z$/.test(value);
   };
 
   const onSubmit = () => {
@@ -109,9 +131,15 @@ const AddOAuth2VendorModal = (props: PropsToAddModal) => {
           id="oauth2-vendor-cacert"
           name="oauth2vendorcacert"
           value={caCert}
-          onChange={(_event, value) => setCaCert(value)}
+          onChange={(_event, value) => {
+            setCaCert(value);
+            setCaCertValidated(
+              validateCaCert(value) ? "default" : "error"
+            );
+          }}
           aria-label="CA certificate"
           isRequired
+          validated={caCertValidated}
           rows={6}
           placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
         />
@@ -159,9 +187,15 @@ const AddOAuth2VendorModal = (props: PropsToAddModal) => {
           id="oauth2-vendor-expires"
           name="oauth2vendornotafter"
           value={expires}
-          onChange={(_event, value) => setExpires(value)}
+          onChange={(_event, value) => {
+            setExpires(value);
+            setExpiresValidated(
+              validateExpires(value) ? "default" : "error"
+            );
+          }}
           type="text"
           aria-label="expires"
+          validated={expiresValidated}
           placeholder="e.g. 20261231235959Z"
         />
       ),
@@ -204,7 +238,12 @@ const AddOAuth2VendorModal = (props: PropsToAddModal) => {
       data-cy="modal-button-add"
       key="add"
       variant="primary"
-      isDisabled={vendorName === "" || caCert === ""}
+      isDisabled={
+        vendorName === "" ||
+        caCert === "" ||
+        caCertValidated === "error" ||
+        expiresValidated === "error"
+      }
       onClick={onSubmit}
     >
       Add
