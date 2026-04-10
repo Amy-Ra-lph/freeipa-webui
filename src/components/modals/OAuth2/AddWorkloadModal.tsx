@@ -30,6 +30,8 @@ const AddOAuth2WorkloadModal = (props: PropsToAddModal) => {
   const [spiffeId, setSpiffeId] = React.useState("");
   const [owner, setOwner] = React.useState("");
   const [servicePrincipal, setServicePrincipal] = React.useState("");
+  const [skills, setSkills] = React.useState("");
+  const [cardTtl, setCardTtl] = React.useState("");
   const [description, setDescription] = React.useState("");
 
   const [addWorkload] = useOauth2WorkloadAddMutation();
@@ -40,16 +42,25 @@ const AddOAuth2WorkloadModal = (props: PropsToAddModal) => {
     setSpiffeId("");
     setOwner("");
     setServicePrincipal("");
+    setSkills("");
+    setCardTtl("");
     setDescription("");
   };
 
   const onSubmit = () => {
+    const skillArray = skills
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
     const payload: OAuth2WorkloadAddPayload = {
       cn: workloadName,
       oauth2workloadtype: workloadType || "",
       oauth2spiffeid: spiffeId || undefined,
       oauth2workloadowner: owner || undefined,
       oauth2workloadserviceprincipal: servicePrincipal || undefined,
+      oauth2workloadskill: skillArray.length > 0 ? skillArray : undefined,
+      oauth2workloadcardttl: cardTtl ? parseInt(cardTtl, 10) : undefined,
       description: description || undefined,
     };
 
@@ -155,6 +166,38 @@ const AddOAuth2WorkloadModal = (props: PropsToAddModal) => {
           type="text"
           aria-label="service principal"
           placeholder="e.g. agent/host.example.com"
+        />
+      ),
+    },
+    {
+      id: "oauth2-workload-skills",
+      name: "Skills (comma-separated)",
+      pfComponent: (
+        <TextInput
+          data-cy="modal-textbox-workload-skills"
+          id="oauth2-workload-skills"
+          name="oauth2workloadskill"
+          value={skills}
+          onChange={(_event, value) => setSkills(value)}
+          type="text"
+          aria-label="workload skills"
+          placeholder="e.g. code-review, deploy, monitor"
+        />
+      ),
+    },
+    {
+      id: "oauth2-workload-card-ttl",
+      name: "Card TTL (seconds)",
+      pfComponent: (
+        <TextInput
+          data-cy="modal-textbox-workload-card-ttl"
+          id="oauth2-workload-card-ttl"
+          name="oauth2workloadcardttl"
+          value={cardTtl}
+          onChange={(_event, value) => setCardTtl(value)}
+          type="number"
+          aria-label="card TTL"
+          placeholder="e.g. 3600"
         />
       ),
     },

@@ -1,6 +1,9 @@
 import React from "react";
 // PatternFly
 import {
+  Button,
+  CodeBlock,
+  CodeBlockCode,
   Flex,
   FlexItem,
   Form,
@@ -37,9 +40,12 @@ import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
 import {
   OAuth2WorkloadModPayload,
   useOauth2WorkloadModMutation,
+  useLazyOauth2WorkloadShowCardQuery,
 } from "src/services/rpcOAuth2";
 // Components
 import IpaTextInput from "src/components/Form/IpaTextInput/IpaTextInput";
+import IpaNumberInput from "src/components/Form/IpaNumberInput";
+import IpaTextArea from "src/components/Form/IpaTextArea";
 import TabLayout from "src/components/layouts/TabLayout";
 import SecondaryButton from "src/components/layouts/SecondaryButton";
 import HelpTextWithIconLayout from "src/components/layouts/HelpTextWithIconLayout";
@@ -65,6 +71,8 @@ const OAuth2WorkloadsSettings = (props: PropsToSettings) => {
   useUpdateRoute({ pathname: props.pathname });
 
   const [isDataLoading, setIsDataLoading] = React.useState(false);
+  const [cardPreview, setCardPreview] = React.useState<string | null>(null);
+  const [isCardLoading, setIsCardLoading] = React.useState(false);
 
   const { ipaObject, recordOnChange } = asRecord(
     props.workload,
@@ -72,6 +80,23 @@ const OAuth2WorkloadsSettings = (props: PropsToSettings) => {
   );
 
   const [saveWorkload] = useOauth2WorkloadModMutation();
+  const [fetchShowCard] = useLazyOauth2WorkloadShowCardQuery();
+
+  const onPreviewCard = () => {
+    const workloadName = props.workload.cn?.toString();
+    if (!workloadName) return;
+
+    setIsCardLoading(true);
+    setCardPreview(null);
+    fetchShowCard(workloadName).then((response) => {
+      setIsCardLoading(false);
+      if (response.data) {
+        setCardPreview(JSON.stringify(response.data, null, 2));
+      } else if (response.error) {
+        setCardPreview("Error loading agent card");
+      }
+    });
+  };
 
   const onRevert = () => {
     props.onWorkloadChange(props.originalWorkload);
@@ -117,6 +142,8 @@ const OAuth2WorkloadsSettings = (props: PropsToSettings) => {
       "oauth2workloadserviceprincipal",
       "oauth2enabled",
       "oauth2maxtokenlifetime",
+      "oauth2workloadskill",
+      "oauth2workloadcardttl",
       "description",
     ]);
 
@@ -212,6 +239,9 @@ const OAuth2WorkloadsSettings = (props: PropsToSettings) => {
             </JumpLinksItem>
             <JumpLinksItem key={2} href="#token-settings">
               Token settings
+            </JumpLinksItem>
+            <JumpLinksItem key={3} href="#agent-card-settings">
+              Agent Card
             </JumpLinksItem>
           </JumpLinks>
         </SidebarPanel>
@@ -382,6 +412,76 @@ const OAuth2WorkloadsSettings = (props: PropsToSettings) => {
                     metadata={props.metadata}
                   />
                 </FormGroup>
+              </Form>
+            </FlexItem>
+          </Flex>
+          <TitleLayout
+            key={3}
+            headingLevel="h2"
+            id="agent-card-settings"
+            text="Agent Card"
+            className="pf-v6-u-mt-lg pf-v6-u-mb-md"
+          />
+          <Flex direction={{ default: "column", lg: "row" }}>
+            <FlexItem flex={{ default: "flex_1" }}>
+              <Form className="pf-v6-u-mb-lg">
+                <FormGroup
+                  label="Skills (one per line)"
+                  fieldId="oauth2workloadskill"
+                >
+                  <IpaTextArea
+                    dataCy="oauth2-workloads-tab-settings-textarea-oauth2workloadskill"
+                    name={"oauth2workloadskill"}
+                    ariaLabel={"Skills"}
+                    ipaObject={ipaObject}
+                    onChange={recordOnChange}
+                    objectName="oauth2workload"
+                    metadata={props.metadata}
+                  />
+                </FormGroup>
+                <FormGroup
+                  label="Card TTL (seconds)"
+                  fieldId="oauth2workloadcardttl"
+                >
+                  <IpaNumberInput
+                    dataCy="oauth2-workloads-tab-settings-number-oauth2workloadcardttl"
+                    id="oauth2workloadcardttl"
+                    name={"oauth2workloadcardttl"}
+                    ariaLabel={"Card TTL (seconds)"}
+                    ipaObject={ipaObject}
+                    onChange={recordOnChange}
+                    objectName="oauth2workload"
+                    metadata={props.metadata}
+                    minValue={60}
+                    maxValue={86400}
+                    numCharsShown={6}
+                  />
+                </FormGroup>
+                <FormGroup fieldId="preview-card">
+                  <Button
+                    variant="secondary"
+                    onClick={onPreviewCard}
+                    isLoading={isCardLoading}
+                    isDisabled={isCardLoading}
+                    data-cy="oauth2-workloads-tab-settings-button-preview-card"
+                  >
+                    Preview Card
+                  </Button>
+                </FormGroup>
+                {cardPreview !== null && (
+                  <FormGroup
+                    label="Agent Card Preview"
+                    fieldId="card-preview"
+                  >
+                    <CodeBlock>
+                      <CodeBlockCode
+                        data-cy="oauth2-workloads-tab-settings-card-preview"
+                      >
+                        {cardPreview}
+                      </CodeBlockCode>
+                    </CodeBlock>
+                  </FormGroup>
+                )}
               </Form>
             </FlexItem>
           </Flex>

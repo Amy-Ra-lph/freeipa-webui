@@ -75,6 +75,8 @@ export interface OAuth2WorkloadAddPayload {
   oauth2workloadserviceprincipal?: string;
   oauth2enabled?: string;
   oauth2maxtokenlifetime?: number;
+  oauth2workloadskill?: string[];
+  oauth2workloadcardttl?: number;
   description?: string;
   version?: string;
 }
@@ -88,6 +90,8 @@ export interface OAuth2WorkloadModPayload {
   oauth2workloadserviceprincipal?: string;
   oauth2enabled?: string;
   oauth2maxtokenlifetime?: string;
+  oauth2workloadskill?: string[];
+  oauth2workloadcardttl?: string;
   description?: string;
 }
 
@@ -736,6 +740,12 @@ const extendedApi = api.injectEndpoints({
         if (payload.oauth2maxtokenlifetime !== undefined) {
           params.oauth2maxtokenlifetime = payload.oauth2maxtokenlifetime;
         }
+        if (payload.oauth2workloadskill) {
+          params.oauth2workloadskill = payload.oauth2workloadskill;
+        }
+        if (payload.oauth2workloadcardttl !== undefined) {
+          params.oauth2workloadcardttl = payload.oauth2workloadcardttl;
+        }
         if (payload.description) {
           params.description = payload.description;
         }
@@ -793,6 +803,8 @@ const extendedApi = api.injectEndpoints({
           "oauth2workloadserviceprincipal",
           "oauth2enabled",
           "oauth2maxtokenlifetime",
+          "oauth2workloadskill",
+          "oauth2workloadcardttl",
           "description",
         ];
 
@@ -806,6 +818,19 @@ const extendedApi = api.injectEndpoints({
         return getCommand({
           method: "oauth2workload_mod",
           params: [[payload.workloadName], params],
+        });
+      },
+    }),
+
+    oauth2WorkloadShowCard: build.query({
+      query: (workloadName: string) => {
+        const params = [
+          [workloadName],
+          { version: API_VERSION_BACKUP },
+        ];
+        return getCommand({
+          method: "oauth2workload_show_card",
+          params: params,
         });
       },
     }),
@@ -1284,6 +1309,8 @@ export const {
   useOauth2WorkloadDeleteMutation,
   useOauth2WorkloadShowQuery,
   useOauth2WorkloadModMutation,
+  useOauth2WorkloadShowCardQuery,
+  useLazyOauth2WorkloadShowCardQuery,
   useGetOAuth2DelegationEntriesQuery,
   useSearchOAuth2DelegationEntriesMutation,
   useOauth2DelegationAddMutation,

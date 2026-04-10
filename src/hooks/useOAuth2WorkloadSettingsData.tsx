@@ -15,6 +15,8 @@ export interface OAuth2Workload {
   oauth2workloadserviceprincipal: string[];
   oauth2enabled: string[];
   oauth2maxtokenlifetime: string[];
+  oauth2workloadskill: string[];
+  oauth2workloadcardttl: string[];
   description: string[];
 }
 

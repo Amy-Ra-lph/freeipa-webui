@@ -48,6 +48,7 @@ interface OAuth2Workload {
   oauth2workloadowner: string[];
   oauth2spiffeid: string[];
   oauth2workloadserviceprincipal: string[];
+  oauth2workloadskill: string[];
   oauth2enabled: string[];
 }
 
@@ -397,6 +398,7 @@ const OAuth2Workloads = () => {
                     keyNames={[
                       "cn",
                       "oauth2workloadtype",
+                      "oauth2workloadskill",
                       "oauth2workloadowner",
                       "oauth2workloadserviceprincipal",
                       "oauth2enabled",
@@ -404,6 +406,7 @@ const OAuth2Workloads = () => {
                     columnNames={[
                       "Name",
                       "Type",
+                      "Skills",
                       "Owner",
                       "Service Principal",
                       "Enabled",
@@ -464,8 +467,8 @@ const OAuth2Workloads = () => {
           updateIsDeleteButtonDisabled: setIsDeleteButtonDisabled,
           updateIsDeletion: setIsDeletion,
         }}
-        columnNames={["Name", "Type", "Owner", "Service Principal", "Enabled"]}
-        keyNames={["cn", "oauth2workloadtype", "oauth2workloadowner", "oauth2workloadserviceprincipal", "oauth2enabled"]}
+        columnNames={["Name", "Type", "Skills", "Owner", "Service Principal", "Enabled"]}
+        keyNames={["cn", "oauth2workloadtype", "oauth2workloadskill", "oauth2workloadowner", "oauth2workloadserviceprincipal", "oauth2enabled"]}
         onRefresh={refreshData}
       />
     </div>
