@@ -264,9 +264,13 @@ const MainTable = <T,>(props: PropsToTable<T>) => {
     if (keyName === props.statusElementName) {
       const isEnabled = invertStatusValue(status.toString() === "true");
 
-      return { color: isEnabled ? "black" : "grey" };
+      return {
+        color: isEnabled
+          ? "var(--pf-t--global--text--color--regular)"
+          : "var(--pf-t--global--text--color--disabled)",
+      };
     }
-    return { color: "black" };
+    return { color: "var(--pf-t--global--text--color--regular)" };
   };
 
   // Helper function to process boolean elements and return a string

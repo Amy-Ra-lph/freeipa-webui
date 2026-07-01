@@ -36,6 +36,8 @@ import avatarImg from "/assets/images/avatarImg.svg";
 // Redux
 import { useAppDispatch } from "./store/hooks";
 import { setIsLogout } from "./store/Global/auth-slice";
+// Theme
+import ThemeToggle from "./components/ThemeToggle";
 // RPC
 import { useLogoutMutation } from "./services/rpcAuth";
 import { useGetUserDetailsByUidMutation } from "./services/rpcUsers";
@@ -163,6 +165,7 @@ const AppLayout = (props: PropsToAppLayout) => {
           align={{ default: "alignEnd" }}
           gap={{ default: "gapNone", md: "gapMd" }}
         >
+          <ThemeToggle />
           <ToolbarItem>{dropdown}</ToolbarItem>
         </ToolbarGroup>
       </ToolbarContent>
