@@ -1,6 +1,7 @@
 import React from "react";
 // PatternFly
-import { PageSection } from "@patternfly/react-core";
+import { Flex, FlexItem, Label, PageSection, Tooltip } from "@patternfly/react-core";
+import { ExclamationTriangleIcon } from "@patternfly/react-icons";
 import {
   EdgeStyle,
   NodeShape,
@@ -19,6 +20,13 @@ import TopologyVisualization from "src/components/TopologyVisualization/Topology
 // Hooks
 import { useTopologyGraph } from "src/hooks/useTopologyGraph";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
+// Analysis
+import {
+  computeTopologyAnalysis,
+  computeHealthScore,
+  classifyTopologyPattern,
+  healthScoreVariant,
+} from "src/utils/topologyAnalysis";
 
 // Constants
 const NODE_SHAPE = NodeShape.ellipse;
@@ -61,9 +69,32 @@ const TopologyGraph = () => {
         source: `node-${segment.iparepltoposegmentleftnode}`,
         target: `node-${segment.iparepltoposegmentrightnode}`,
         edgeStyle: EdgeStyle.default,
-        data: { suffixType: segment.suffixType },
+        data: { suffixType: segment.suffixType, segmentCN: segment.cn },
       })),
     [topologySegments]
+  );
+
+  // Topology analysis
+  const healthScore = React.useMemo(
+    () =>
+      servers.length > 0
+        ? computeHealthScore(servers, topologySegments)
+        : null,
+    [servers, topologySegments]
+  );
+  const analysis = React.useMemo(
+    () =>
+      servers.length > 0
+        ? computeTopologyAnalysis(servers, topologySegments)
+        : null,
+    [servers, topologySegments]
+  );
+  const pattern = React.useMemo(
+    () =>
+      servers.length > 0
+        ? classifyTopologyPattern(servers, topologySegments)
+        : null,
+    [servers, topologySegments]
   );
 
   // Toolbar items
@@ -101,6 +132,53 @@ const TopologyGraph = () => {
         </SecondaryButton>
       ),
     },
+    ...(healthScore
+      ? [
+          {
+            key: 3,
+            element: (
+              <Flex
+                spaceItems={{ default: "spaceItemsSm" }}
+                alignItems={{ default: "alignItemsCenter" }}
+              >
+                <FlexItem>
+                  <Tooltip
+                    content={
+                      pattern
+                        ? `${pattern.patternLabel}: ${pattern.description}`
+                        : "Topology pattern"
+                    }
+                  >
+                    <Label
+                      color={
+                        healthScoreVariant(healthScore.score) === "success"
+                          ? "green"
+                          : healthScoreVariant(healthScore.score) === "warning"
+                            ? "orange"
+                            : "red"
+                      }
+                      data-cy="topology-health-badge"
+                    >
+                      {healthScore.score} {healthScore.label}
+                    </Label>
+                  </Tooltip>
+                </FlexItem>
+                {analysis && analysis.articulationPoints.size > 0 && (
+                  <FlexItem>
+                    <Tooltip
+                      content={`${analysis.articulationPoints.size} single point(s) of failure`}
+                    >
+                      <Label color="orange" icon={<ExclamationTriangleIcon />}>
+                        {analysis.articulationPoints.size}
+                      </Label>
+                    </Tooltip>
+                  </FlexItem>
+                )}
+              </Flex>
+            ),
+          },
+        ]
+      : []),
   ];
 
   // Spinner on loading state
@@ -119,7 +197,16 @@ const TopologyGraph = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false} isFilled={true}>
         <ToolbarLayout toolbarItems={toolbarItems} />
-        <TopologyVisualization nodes={nodes} edges={edges} />
+        <TopologyVisualization
+          nodes={nodes}
+          edges={edges}
+          articulationPoints={
+            analysis
+              ? new Set([...analysis.articulationPoints].map((n) => `node-${n}`))
+              : undefined
+          }
+          bridges={analysis?.bridges}
+        />
       </PageSection>
     </>
   );
