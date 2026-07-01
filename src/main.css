@@ -43,3 +43,71 @@ code {
   background-color: rgb(222, 243, 255);
   padding: 0.2em;
 }
+
+/*
+ * Dark mode: PF6 6.4.0 has dark-context tokens (--pf-t--global--dark--*)
+ * for masthead/sidebar but no full dark theme. We remap the regular semantic
+ * tokens to use PF6's dark equivalents. Base palette stays untouched so
+ * dark-context components (masthead, nav) keep working.
+ */
+:root.pf-v6-theme-dark {
+  /* Backgrounds: gray-95 → gray-80 → gray-70 (dark scale) */
+  --pf-t--global--background--color--100: var(--pf-t--color--gray--95);
+  --pf-t--global--background--color--200: var(--pf-t--color--gray--80);
+  --pf-t--global--background--color--300: var(--pf-t--color--gray--70);
+  --pf-t--global--background--color--400: var(--pf-t--color--gray--10);
+  --pf-t--global--background--color--450: var(--pf-t--color--gray--20);
+
+  /* Text: white on dark */
+  --pf-t--global--text--color--100: var(--pf-t--color--white);
+  --pf-t--global--text--color--200: var(--pf-t--color--gray--30);
+  --pf-t--global--text--color--300: var(--pf-t--color--gray--90);
+  --pf-t--global--text--color--400: var(--pf-t--color--red-orange--30);
+
+  /* Links: brighten for dark bg */
+  --pf-t--global--text--color--link--100: var(--pf-t--color--blue--20);
+  --pf-t--global--text--color--link--200: var(--pf-t--color--blue--10);
+  --pf-t--global--text--color--link--300: var(--pf-t--color--purple--30);
+
+  /* Brand (buttons, active states): lighter blues */
+  --pf-t--global--color--brand--default: var(--pf-t--color--blue--30);
+  --pf-t--global--color--brand--hover: var(--pf-t--color--blue--20);
+  --pf-t--global--color--brand--clicked: var(--pf-t--color--blue--20);
+
+  /* Borders */
+  --pf-t--global--border--color--default: var(--pf-t--color--gray--40);
+  --pf-t--global--border--color--100: var(--pf-t--color--gray--50);
+  --pf-t--global--border--color--200: var(--pf-t--color--gray--40);
+  --pf-t--global--border--color--300: var(--pf-t--color--gray--30);
+  --pf-t--global--border--color--50: var(--pf-t--color--gray--60);
+
+  /* Icons */
+  --pf-t--global--icon--color--100: var(--pf-t--color--gray--10);
+  --pf-t--global--icon--color--200: var(--pf-t--color--gray--40);
+  --pf-t--global--icon--color--300: var(--pf-t--color--gray--90);
+
+  /* Disabled states */
+  --pf-t--global--color--disabled--100: var(--pf-t--color--gray--40);
+  --pf-t--global--color--disabled--200: var(--pf-t--color--gray--50);
+  --pf-t--global--color--disabled--300: var(--pf-t--color--gray--70);
+
+  /* Status colors — use dark variants */
+  --pf-t--global--color--status--danger--default: var(--pf-t--color--red-orange--50);
+  --pf-t--global--color--status--warning--default: var(--pf-t--color--yellow--30);
+  --pf-t--global--color--status--success--default: var(--pf-t--color--green--40);
+  --pf-t--global--color--status--info--default: var(--pf-t--color--purple--30);
+  --pf-t--global--color--status--custom--default: var(--pf-t--color--teal--40);
+
+  /* Overlays/backdrop */
+  --pf-t--global--background--color--500: rgba(0, 0, 0, 0.8);
+  --pf-t--global--background--color--600: rgba(199, 199, 199, 0.15);
+}
+
+/* Custom element overrides for dark mode */
+.pf-v6-theme-dark code {
+  background-color: rgb(30, 60, 80);
+}
+
+.pf-v6-theme-dark .pf-v6-c-background-image {
+  --pf-v6-c-background-image--BackgroundColor: var(--pf-t--color--gray--95);
+}

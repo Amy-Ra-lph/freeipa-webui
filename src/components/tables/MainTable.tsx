@@ -254,11 +254,12 @@ const MainTable = <T,>(props: PropsToTable<T>) => {
 
   // Helper method: Set styles depending on the status
   const setStyleOnStatus = (status: Status) => {
-    if (status === "false") {
-      return { color: "grey" };
-    } else if (status === "true") {
-      return { color: "black" };
-    }
+    const isEnabled = status === "true";
+    return {
+      color: isEnabled
+        ? "var(--pf-t--global--text--color--regular)"
+        : "var(--pf-t--global--text--color--disabled)",
+    };
   };
 
   // Helper function to process boolean elements and return a string

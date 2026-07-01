@@ -23,6 +23,8 @@ import {
 import { setIsLogin, setIsLogout } from "./store/Global/auth-slice";
 // Alerts
 import ManagedAlerts from "./components/ManagedAlerts";
+// Theme
+import { ThemeProvider } from "./ThemeContext";
 
 const App: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
@@ -122,7 +124,7 @@ const App: React.FunctionComponent = () => {
     return <DataSpinner />;
   }
   return (
-    <>
+    <ThemeProvider>
       <ManagedAlerts />
       {hasUser && userLoggedIn && (
         <AppLayout loggedInUser={loggedInUser}>
@@ -134,7 +136,7 @@ const App: React.FunctionComponent = () => {
           <AppRoutes isInitialDataLoaded={isDataLoaded} />
         </>
       )}
-    </>
+    </ThemeProvider>
   );
 };
 
