@@ -164,7 +164,11 @@ export interface GenericPayload {
     | "idoverrideuser"
     | "idoverridegroup"
     | "automember"
-    | "selfservice";
+    | "selfservice"
+    | "oauth2client"
+    | "oauth2scope"
+    | "oauth2workload"
+    | "oauth2delegation";
 }
 
 export interface GetEntriesPayload {
@@ -437,7 +441,11 @@ export const api = createApi({
             objName === "hbacsvc" ||
             objName === "hbacsvcgroup" ||
             objName === "sudorule" ||
-            objName === "sudocmdgroup"
+            objName === "sudocmdgroup" ||
+            objName === "oauth2client" ||
+            objName === "oauth2scope" ||
+            objName === "oauth2workload" ||
+            objName === "oauth2delegation"
           ) {
             id = idResponseData.result.result[i] as cnType;
           } else if (objName === "role") {
@@ -468,7 +476,11 @@ export const api = createApi({
         if (
           objName === "idview" ||
           objName === "delegation" ||
-          objName === "selfservice"
+          objName === "selfservice" ||
+          objName === "oauth2client" ||
+          objName === "oauth2scope" ||
+          objName === "oauth2workload" ||
+          objName === "oauth2delegation"
         ) {
           // There is no "no_members" param
           payloadDataBatch = ids.map((name) => ({
@@ -630,7 +642,11 @@ export const api = createApi({
             entryType === "hbacsvcgroup" ||
             entryType === "sudocmdgroup" ||
             entryType === "idview" ||
-            entryType === "sudorule"
+            entryType === "sudorule" ||
+            entryType === "oauth2client" ||
+            entryType === "oauth2scope" ||
+            entryType === "oauth2workload" ||
+            entryType === "oauth2delegation"
           ) {
             const groupId = responseData.result.result[i] as cnType;
             const { cn } = groupId;

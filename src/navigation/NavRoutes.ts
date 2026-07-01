@@ -92,6 +92,15 @@ const SelfServiceGroupRef = "self-service";
 const DelegationGroupRef = "delegation";
 // - Configuration
 const ConfigRef = "configuration";
+// WORKLOAD IDENTITY
+const WorkloadsGroupRef = "workloads";
+// IPA SERVER - Topology (additional)
+const TopologyNodesGroupRef = "topology-nodes";
+const TopologyReplicasGroupRef = "topology-replicas";
+const OAuth2ClientsGroupRef = "oauth2-clients";
+const OAuth2ScopesGroupRef = "oauth2-scopes";
+const OAuth2DelegationsGroupRef = "oauth2-delegations";
+const SpiffeEntriesGroupRef = "spiffe-entries";
 
 // List of navigation routes (UI)
 export const getNavigationRoutes = (
@@ -241,6 +250,49 @@ export const getNavigationRoutes = (
               path: "subordinate-id-statistics",
             },
           ],
+        },
+      ],
+    },
+    {
+      label: "Workload Identity",
+      group: "",
+      title: `${BASE_TITLE} - Workload Identity`,
+      path: "",
+      items: [
+        {
+          label: "Workloads",
+          group: WorkloadsGroupRef,
+          title: `${BASE_TITLE} - Workloads`,
+          path: "workloads",
+          items: [],
+        },
+        {
+          label: "OAuth2 Clients",
+          group: OAuth2ClientsGroupRef,
+          title: `${BASE_TITLE} - OAuth2 Clients`,
+          path: "oauth2-clients",
+          items: [],
+        },
+        {
+          label: "OAuth2 Scopes",
+          group: OAuth2ScopesGroupRef,
+          title: `${BASE_TITLE} - OAuth2 Scopes`,
+          path: "oauth2-scopes",
+          items: [],
+        },
+        {
+          label: "Delegations",
+          group: OAuth2DelegationsGroupRef,
+          title: `${BASE_TITLE} - Delegations`,
+          path: "oauth2-delegations",
+          items: [],
+        },
+        {
+          label: "SPIFFE Entries",
+          group: SpiffeEntriesGroupRef,
+          title: `${BASE_TITLE} - SPIFFE Entries`,
+          path: "spiffe-entries",
+          items: [],
         },
       ],
     },
@@ -583,6 +635,20 @@ export const getNavigationRoutes = (
               group: TopologySegmentsGroupRef,
               title: `${BASE_TITLE} - Topology segments`,
               path: "topology-segments",
+              items: [],
+            },
+            {
+              label: "Topology nodes",
+              group: TopologyNodesGroupRef,
+              title: `${BASE_TITLE} - Topology nodes`,
+              path: "topology-nodes",
+              items: [],
+            },
+            {
+              label: "Topology replicas",
+              group: TopologyReplicasGroupRef,
+              title: `${BASE_TITLE} - Topology replicas`,
+              path: "topology-replicas",
               items: [],
             },
           ],

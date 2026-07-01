@@ -107,6 +107,13 @@ import TopologySuffixesTabs from "src/pages/TopologySuffixes/TopologySuffixesTab
 import TopologySegments from "src/pages/TopologySegments/TopologySegments";
 import TopologySegmentsTabs from "src/pages/TopologySegments/TopologySegmentsTabs";
 import RealmDomains from "src/pages/RealmDomains/RealmDomains";
+import Workloads from "src/pages/Workloads/Workloads";
+import OAuth2Clients from "src/pages/OAuth2Clients/OAuth2Clients";
+import OAuth2Scopes from "src/pages/OAuth2Scopes/OAuth2Scopes";
+import OAuth2Delegations from "src/pages/OAuth2Delegations/OAuth2Delegations";
+import SpiffeEntries from "src/pages/SpiffeEntries/SpiffeEntries";
+import TopologyNodes from "src/pages/TopologyNodes/TopologyNodes";
+import TopologyReplicas from "src/pages/TopologyReplicas/TopologyReplicas";
 
 // Renders routes (React)
 export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
@@ -744,6 +751,27 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
                     element={<TopologySegmentsTabs section="settings" />}
                   />
                 </Route>
+              </Route>
+              <Route path="topology-nodes">
+                <Route path="" element={<TopologyNodes />} />
+              </Route>
+              <Route path="topology-replicas">
+                <Route path="" element={<TopologyReplicas />} />
+              </Route>
+              <Route path="workloads">
+                <Route path="" element={<Workloads />} />
+              </Route>
+              <Route path="oauth2-clients">
+                <Route path="" element={<OAuth2Clients />} />
+              </Route>
+              <Route path="oauth2-scopes">
+                <Route path="" element={<OAuth2Scopes />} />
+              </Route>
+              <Route path="oauth2-delegations">
+                <Route path="" element={<OAuth2Delegations />} />
+              </Route>
+              <Route path="spiffe-entries">
+                <Route path="" element={<SpiffeEntries />} />
               </Route>
               <Route path="realm-domains">
                 <Route path="" element={<RealmDomains />} />
