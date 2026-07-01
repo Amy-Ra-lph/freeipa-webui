@@ -101,11 +101,15 @@ const DeleteCertProfilesModal = (props: DeleteCertProfilesModalProps) => {
         const result = data.result;
 
         if (result) {
-          if ("error" in result.results[0] && result.results[0].error) {
+          const errorResults = (result.results as unknown as any[]).filter(
+            (r: any) => "error" in r && r.error
+          );
+          if (errorResults.length > 0) {
+            const firstError = errorResults[0];
             const errorData = {
-              code: result.results[0].error_code,
-              name: result.results[0].error_name,
-              error: result.results[0].error,
+              code: firstError.error_code,
+              name: firstError.error_name,
+              error: firstError.error,
             } as ErrorData;
 
             const error = {

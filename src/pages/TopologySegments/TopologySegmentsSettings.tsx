@@ -5,9 +5,15 @@ import {
   Flex,
   Form,
   FormGroup,
+  MenuToggle,
+  MenuToggleElement,
+  Select,
+  SelectList,
+  SelectOption,
   Sidebar,
   SidebarContent,
   SidebarPanel,
+  Switch,
 } from "@patternfly/react-core";
 // Forms
 import IpaTextInput from "src/components/Form/IpaTextInput";
@@ -61,6 +67,19 @@ const TopologySegmentsSettings = (props: PropsToSettings) => {
   );
 
   const [isSaving, setSaving] = useState(false);
+  const [isDirectionOpen, setIsDirectionOpen] = useState(false);
+
+  // Direction select toggle
+  const directionToggle = (toggleRef: React.Ref<MenuToggleElement>) => (
+    <MenuToggle
+      data-cy="topology-segments-tab-settings-direction-selector"
+      ref={toggleRef}
+      onClick={() => setIsDirectionOpen(!isDirectionOpen)}
+      isExpanded={isDirectionOpen}
+    >
+      {ipaObject.iparepltoposegmentdirection || "both"}
+    </MenuToggle>
+  );
 
   // 'Save' handler method
   const onSave = (event: React.FormEvent<HTMLFormElement>) => {
@@ -222,15 +241,44 @@ const TopologySegmentsSettings = (props: PropsToSettings) => {
                 label="Direction"
                 fieldId="iparepltoposegmentdirection"
               >
-                <IpaTextInput
-                  dataCy="topology-segments-tab-settings-textinput-direction"
-                  name="iparepltoposegmentdirection"
-                  ariaLabel="Direction"
-                  ipaObject={ipaObject}
-                  onChange={recordOnChange}
-                  objectName="topologysegment"
-                  metadata={props.metadata}
-                />
+                <Select
+                  id="iparepltoposegmentdirection"
+                  data-cy="topology-segments-tab-settings-select-direction"
+                  isOpen={isDirectionOpen}
+                  selected={ipaObject.iparepltoposegmentdirection}
+                  onSelect={(_event, selection) => {
+                    if (selection && typeof selection === "string") {
+                      recordOnChange({
+                        ...ipaObject,
+                        iparepltoposegmentdirection: selection,
+                      });
+                    }
+                    setIsDirectionOpen(false);
+                  }}
+                  onOpenChange={setIsDirectionOpen}
+                  toggle={directionToggle}
+                >
+                  <SelectList>
+                    <SelectOption
+                      data-cy="direction-option-both"
+                      value="both"
+                    >
+                      both
+                    </SelectOption>
+                    <SelectOption
+                      data-cy="direction-option-left-right"
+                      value="left-right"
+                    >
+                      left-right
+                    </SelectOption>
+                    <SelectOption
+                      data-cy="direction-option-right-left"
+                      value="right-left"
+                    >
+                      right-left
+                    </SelectOption>
+                  </SelectList>
+                </Select>
               </FormGroup>
               <FormGroup label="Timeout" fieldId="nsds5replicatimeout">
                 <IpaTextInput
@@ -244,14 +292,17 @@ const TopologySegmentsSettings = (props: PropsToSettings) => {
                 />
               </FormGroup>
               <FormGroup label="Enabled" fieldId="nsds5replicaenabled">
-                <IpaTextInput
-                  dataCy="topology-segments-tab-settings-textinput-enabled"
-                  name="nsds5replicaenabled"
-                  ariaLabel="Enabled"
-                  ipaObject={ipaObject}
-                  onChange={recordOnChange}
-                  objectName="topologysegment"
-                  metadata={props.metadata}
+                <Switch
+                  id="nsds5replicaenabled"
+                  data-cy="topology-segments-tab-settings-switch-enabled"
+                  label={ipaObject.nsds5replicaenabled === "on" ? "On" : "Off"}
+                  isChecked={ipaObject.nsds5replicaenabled === "on"}
+                  onChange={(_event, checked) => {
+                    recordOnChange({
+                      ...ipaObject,
+                      nsds5replicaenabled: checked ? "on" : "off",
+                    });
+                  }}
                 />
               </FormGroup>
             </Form>

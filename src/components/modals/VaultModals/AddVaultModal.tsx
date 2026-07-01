@@ -4,6 +4,7 @@ import React from "react";
 import {
   Button,
   TextArea,
+  TextInput,
   MenuToggle,
   MenuToggleElement,
   Select,
@@ -41,6 +42,8 @@ const AddVaultModal = (props: PropsToAddModal) => {
   const [isAddButtonSpinning, setIsAddButtonSpinning] = React.useState(false);
   const [vaultName, setVaultName] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const [vaultPassword, setVaultPassword] = React.useState("");
+  const [vaultPublicKey, setVaultPublicKey] = React.useState("");
 
   // Vault type select
   const [isTypeOpen, setIsTypeOpen] = React.useState(false);
@@ -64,10 +67,13 @@ const AddVaultModal = (props: PropsToAddModal) => {
     </MenuToggle>
   );
 
-  const typeOnSelect = (selection: any) => {
-    setVaultType(
-      selection.target.textContent as "standard" | "symmetric" | "asymmetric"
-    );
+  const typeOnSelect = (
+    _event: React.MouseEvent<Element, MouseEvent> | undefined,
+    selection: string | number | undefined
+  ) => {
+    if (selection && typeof selection === "string") {
+      setVaultType(selection as "standard" | "symmetric" | "asymmetric");
+    }
     setIsTypeOpen(false);
   };
 
@@ -76,6 +82,8 @@ const AddVaultModal = (props: PropsToAddModal) => {
     setVaultName("");
     setDescription("");
     setVaultType("standard");
+    setVaultPassword("");
+    setVaultPublicKey("");
   };
 
   // 'Add' button handler
@@ -86,6 +94,12 @@ const AddVaultModal = (props: PropsToAddModal) => {
       cn: vaultName,
       description: description || undefined,
       ipavaulttype: vaultType,
+      ...(vaultType === "symmetric" && vaultPassword
+        ? { password: vaultPassword }
+        : {}),
+      ...(vaultType === "asymmetric" && vaultPublicKey
+        ? { ipavaultpublickey: vaultPublicKey }
+        : {}),
     }).then((response) => {
       if ("data" in response) {
         const data = response.data?.result;
@@ -182,12 +196,56 @@ const AddVaultModal = (props: PropsToAddModal) => {
     },
   ];
 
+  if (vaultType === "symmetric") {
+    fields.push({
+      id: "modal-form-vault-password",
+      name: "Vault password",
+      pfComponent: (
+        <TextInput
+          data-cy="modal-textbox-vault-password"
+          type="password"
+          id="modal-form-vault-password"
+          name="password"
+          value={vaultPassword}
+          onChange={(_event, value: string) => setVaultPassword(value)}
+          aria-label="Vault password"
+        />
+      ),
+      fieldRequired: true,
+    });
+  }
+
+  if (vaultType === "asymmetric") {
+    fields.push({
+      id: "modal-form-vault-public-key",
+      name: "Public key (PEM)",
+      pfComponent: (
+        <TextArea
+          data-cy="modal-textbox-vault-public-key"
+          id="modal-form-vault-public-key"
+          name="ipavaultpublickey"
+          value={vaultPublicKey}
+          onChange={(_event, value: string) => setVaultPublicKey(value)}
+          aria-label="Vault public key in PEM format"
+          autoResize
+          placeholder="-----BEGIN PUBLIC KEY-----"
+        />
+      ),
+      fieldRequired: true,
+    });
+  }
+
   // Actions
   const modalActions: JSX.Element[] = [
     <Button
       data-cy="modal-button-add"
       key="add-new"
-      isDisabled={isAddButtonSpinning || vaultName === ""}
+      isDisabled={
+        isAddButtonSpinning ||
+        vaultName === "" ||
+        (vaultType === "symmetric" && vaultPassword === "") ||
+        (vaultType === "asymmetric" && vaultPublicKey === "")
+      }
       form="add-modal-form"
       type="submit"
     >

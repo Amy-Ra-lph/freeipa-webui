@@ -184,6 +184,7 @@ const VaultsSettings = (props: PropsToSettings) => {
                   onChange={recordOnChange}
                   objectName="vault"
                   metadata={props.metadata}
+                  readOnly
                 />
               </FormGroup>
               <FormGroup label="Description" fieldId="description">

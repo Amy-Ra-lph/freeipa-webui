@@ -126,10 +126,13 @@ const AddPrivilegeModal = (props: PropsToAddModal) => {
       data-cy="modal-button-add"
       key="add-new"
       isDisabled={isAddButtonSpinning || privilegeName === ""}
+      isLoading={isAddButtonSpinning}
+      spinnerAriaValueText="Adding"
+      spinnerAriaLabel="Adding"
       form="add-modal-form"
       type="submit"
     >
-      Add
+      {isAddButtonSpinning ? "Adding" : "Add"}
     </Button>,
     <Button
       data-cy="modal-button-cancel"

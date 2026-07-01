@@ -144,10 +144,13 @@ const AddCertProfileModal = (props: PropsToAddModal) => {
       data-cy="modal-button-add"
       key="add-new"
       isDisabled={isAddButtonSpinning || profileName === ""}
+      isLoading={isAddButtonSpinning}
+      spinnerAriaValueText="Adding"
+      spinnerAriaLabel="Adding"
       form="add-modal-form"
       type="submit"
     >
-      Add
+      {isAddButtonSpinning ? "Adding" : "Add"}
     </Button>,
     <Button
       data-cy="modal-button-cancel"

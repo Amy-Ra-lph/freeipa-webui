@@ -168,7 +168,7 @@ const CertAuthoritiesSettings = (props: PropsToSettings) => {
           <Flex direction={{ default: "column" }} flex={{ default: "flex_1" }}>
             <TitleLayout
               key={0}
-              headingLevel="h1"
+              headingLevel="h2"
               id="cert-authority-settings"
               text="Certificate authority settings"
             />

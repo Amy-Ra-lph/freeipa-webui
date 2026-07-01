@@ -132,6 +132,7 @@ const AddRadiusServerModal = (props: PropsToAddModal) => {
           value={secret}
           onChange={setSecret}
           requiredHelperText="Required value"
+          type="password"
         />
       ),
       fieldRequired: true,
@@ -149,10 +150,13 @@ const AddRadiusServerModal = (props: PropsToAddModal) => {
         server === "" ||
         secret === ""
       }
+      isLoading={isAddButtonSpinning}
+      spinnerAriaValueText="Adding"
+      spinnerAriaLabel="Adding"
       form="add-modal-form"
       type="submit"
     >
-      Add
+      {isAddButtonSpinning ? "Adding" : "Add"}
     </Button>,
     <Button
       data-cy="modal-button-cancel"

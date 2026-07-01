@@ -31,6 +31,7 @@ import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
 import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Modals
 import AddPrivilegeModal from "src/components/modals/PrivilegeModals/AddPrivilegeModal";
 import DeletePrivilegesModal from "src/components/modals/PrivilegeModals/DeletePrivilegesModal";
@@ -38,6 +39,7 @@ import DeletePrivilegesModal from "src/components/modals/PrivilegeModals/DeleteP
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // Utils
 import { API_VERSION_BACKUP, isPrivilegeSelectable } from "src/utils/utils";
 // RPC client
@@ -321,6 +323,11 @@ const Privileges = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "privileges",
+  });
+
   const columnNames = ["Privilege name", "Description"];
   const keyNames = ["cn", "description"];
 
@@ -344,7 +351,7 @@ const Privileges = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search privileges"
-          placeholder="Search"
+          placeholder="Search privileges"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -398,7 +405,12 @@ const Privileges = () => {
     },
     {
       key: 7,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 8,
@@ -415,7 +427,7 @@ const Privileges = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout
           id="privileges-title"
@@ -500,7 +512,7 @@ const Privileges = () => {
         errors={modalErrors.getAll()}
         dataCy="privileges-modal-error"
       />
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

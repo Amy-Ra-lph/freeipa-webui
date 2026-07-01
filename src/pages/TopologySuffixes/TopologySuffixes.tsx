@@ -145,7 +145,20 @@ const TopologySuffixes = () => {
       suffixesDataResponse.isError &&
       suffixesDataResponse.error !== undefined
     ) {
-      window.location.reload();
+      const error = suffixesDataResponse.error as FetchBaseQueryError | SerializedError;
+      let errorMessage = "Error when loading topology suffixes";
+      if ("error" in error) {
+        errorMessage = error.error as string;
+      } else if ("message" in error) {
+        errorMessage = error.message || errorMessage;
+      }
+      dispatch(
+        addAlert({
+          name: "topology-suffixes-load-error",
+          title: errorMessage,
+          variant: "danger",
+        })
+      );
     }
   }, [suffixesDataResponse.isError, isBatchLoading, isFetching]);
 

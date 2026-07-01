@@ -164,7 +164,7 @@ const RadiusServersSettings = (props: PropsToSettings) => {
           <Flex direction={{ default: "column" }} flex={{ default: "flex_1" }}>
             <TitleLayout
               key={0}
-              headingLevel="h1"
+              headingLevel="h2"
               id="radius-server-settings"
               text="RADIUS server settings"
             />
@@ -183,6 +183,7 @@ const RadiusServersSettings = (props: PropsToSettings) => {
                   onChange={recordOnChange}
                   objectName="radiusproxy"
                   metadata={props.metadata}
+                  readOnly
                 />
               </FormGroup>
               <FormGroup label="Server" fieldId="ipatokenradiusserver">
@@ -205,6 +206,7 @@ const RadiusServersSettings = (props: PropsToSettings) => {
                   onChange={recordOnChange}
                   objectName="radiusproxy"
                   metadata={props.metadata}
+                  type="password"
                 />
               </FormGroup>
             </Form>

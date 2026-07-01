@@ -353,7 +353,7 @@ const TopologySegments = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search topology segments"
-          placeholder="Search"
+          placeholder="Search topology segments"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -484,7 +484,7 @@ const TopologySegments = () => {
                     hasCheckboxes={true}
                     pathname="topology-segments"
                     showTableRows={showTableRows}
-                    showLink={false}
+                    showLink={true}
                     elementsData={{
                       isElementSelectable: isTopologySegmentSelectable,
                       selectedElements: selectedSegments,

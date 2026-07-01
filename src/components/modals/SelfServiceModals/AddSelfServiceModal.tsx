@@ -135,10 +135,13 @@ const AddSelfServiceModal = (props: PropsToAddModal) => {
       isDisabled={
         isAddButtonSpinning || selfServiceName === "" || attrs.trim() === ""
       }
+      isLoading={isAddButtonSpinning}
+      spinnerAriaValueText="Adding"
+      spinnerAriaLabel="Adding"
       form="add-modal-form"
       type="submit"
     >
-      Add
+      {isAddButtonSpinning ? "Adding" : "Add"}
     </Button>,
     <Button
       data-cy="modal-button-cancel"

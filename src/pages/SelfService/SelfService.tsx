@@ -31,6 +31,7 @@ import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
 import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Modals
 import AddSelfServiceModal from "src/components/modals/SelfServiceModals/AddSelfServiceModal";
 import DeleteSelfServiceModal from "src/components/modals/SelfServiceModals/DeleteSelfServiceModal";
@@ -38,6 +39,7 @@ import DeleteSelfServiceModal from "src/components/modals/SelfServiceModals/Dele
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // Utils
 import { API_VERSION_BACKUP, isSelfServiceSelectable } from "src/utils/utils";
 // RPC client
@@ -321,6 +323,11 @@ const SelfService = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "self-service-permissions",
+  });
+
   const columnNames = ["Self service name", "Attributes"];
   const keyNames = ["aciname", "attrs"];
 
@@ -344,7 +351,7 @@ const SelfService = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search self service permissions"
-          placeholder="Search"
+          placeholder="Search self-service permissions"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -398,7 +405,12 @@ const SelfService = () => {
     },
     {
       key: 7,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 8,
@@ -415,7 +427,7 @@ const SelfService = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout
           id="self-service-title"
@@ -500,7 +512,7 @@ const SelfService = () => {
         errors={modalErrors.getAll()}
         dataCy="self-service-modal-error"
       />
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

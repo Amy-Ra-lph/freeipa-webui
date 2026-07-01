@@ -31,6 +31,7 @@ import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
 import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Modals
 import AddPermissionModal from "src/components/modals/PermissionModals/AddPermissionModal";
 import DeletePermissionsModal from "src/components/modals/PermissionModals/DeletePermissionsModal";
@@ -38,6 +39,7 @@ import DeletePermissionsModal from "src/components/modals/PermissionModals/Delet
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // Utils
 import { API_VERSION_BACKUP, isPermissionSelectable } from "src/utils/utils";
 // RPC client
@@ -327,6 +329,11 @@ const Permissions = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "permissions",
+  });
+
   const columnNames = [
     "Permission name",
     "Rights",
@@ -355,7 +362,7 @@ const Permissions = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search permissions"
-          placeholder="Search"
+          placeholder="Search permissions"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -409,7 +416,12 @@ const Permissions = () => {
     },
     {
       key: 7,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 8,
@@ -426,7 +438,7 @@ const Permissions = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout
           id="permissions-title"
@@ -511,7 +523,7 @@ const Permissions = () => {
         errors={modalErrors.getAll()}
         dataCy="permissions-modal-error"
       />
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

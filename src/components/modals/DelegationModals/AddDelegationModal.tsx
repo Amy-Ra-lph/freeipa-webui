@@ -262,10 +262,13 @@ const AddDelegationModal = (props: PropsToAddModal) => {
         group === "" ||
         memberof === ""
       }
+      isLoading={isAddButtonSpinning}
+      spinnerAriaValueText="Adding"
+      spinnerAriaLabel="Adding"
       form="add-modal-form"
       type="submit"
     >
-      Add
+      {isAddButtonSpinning ? "Adding" : "Add"}
     </Button>,
     <Button
       data-cy="modal-button-cancel"

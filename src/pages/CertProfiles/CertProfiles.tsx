@@ -31,6 +31,7 @@ import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
 import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Modals
 import AddCertProfileModal from "src/components/modals/CertProfileModals/AddCertProfileModal";
 import DeleteCertProfilesModal from "src/components/modals/CertProfileModals/DeleteCertProfilesModal";
@@ -38,6 +39,7 @@ import DeleteCertProfilesModal from "src/components/modals/CertProfileModals/Del
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // Utils
 import { API_VERSION_BACKUP } from "src/utils/utils";
 // RPC client
@@ -331,6 +333,11 @@ const CertProfiles = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "cert-profiles",
+  });
+
   const columnNames = ["Profile name", "Description", "Store issued"];
   const keyNames = ["cn", "description", "ipacertprofilestoreissued"];
 
@@ -354,7 +361,7 @@ const CertProfiles = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search certificate profiles"
-          placeholder="Search"
+          placeholder="Search certificate profiles"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -408,7 +415,12 @@ const CertProfiles = () => {
     },
     {
       key: 7,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 8,
@@ -425,7 +437,7 @@ const CertProfiles = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout
           id="certprofiles-title"
@@ -510,7 +522,7 @@ const CertProfiles = () => {
         errors={modalErrors.getAll()}
         dataCy="certprofiles-modal-error"
       />
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

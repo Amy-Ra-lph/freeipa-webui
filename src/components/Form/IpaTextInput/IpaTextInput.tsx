@@ -1,6 +1,6 @@
 import React from "react";
 // PatternFly
-import { TextInput } from "@patternfly/react-core";
+import { TextInput, TextInputProps } from "@patternfly/react-core";
 import {
   IPAParamDefinition,
   getParamProperties,
@@ -17,10 +17,12 @@ export interface IpaTextInputProps extends IPAParamDefinition {
   helperTextMessage?: string;
   errorMessage?: string;
   rules?: Array<RuleProps>;
+  type?: TextInputProps["type"];
 }
 
 const IpaTextInput = (props: IpaTextInputProps) => {
   const { required, readOnly, value, onChange } = getParamProperties(props);
+  const inputType = props.type || "text";
 
   const [textInputValue, setTextInputValue] = React.useState<string>(
     convertToString(value)
@@ -41,7 +43,7 @@ const IpaTextInput = (props: IpaTextInputProps) => {
           setTextInputValue(value);
           onChange(value);
         }}
-        type="text"
+        type={inputType}
         aria-label={
           props.ariaLabel !== undefined ? props.ariaLabel : props.name
         }
@@ -65,7 +67,7 @@ const IpaTextInput = (props: IpaTextInputProps) => {
         isRequired={required}
         isDisabled={false}
         rules={props.rules}
-        type="text"
+        type={inputType}
       />
     );
   }
@@ -83,7 +85,7 @@ const IpaTextInput = (props: IpaTextInputProps) => {
         }}
         isDisabled={false}
         requiredHelperText={props.helperTextMessage}
-        type="text"
+        type={inputType}
       />
     );
   }
@@ -98,7 +100,7 @@ const IpaTextInput = (props: IpaTextInputProps) => {
         setTextInputValue(value);
         onChange(value);
       }}
-      type="text"
+      type={inputType}
       aria-label={props.ariaLabel !== undefined ? props.ariaLabel : props.name}
       isRequired={required}
     />

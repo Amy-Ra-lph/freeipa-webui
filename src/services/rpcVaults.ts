@@ -39,6 +39,8 @@ interface VaultAddPayload {
   cn: string;
   description?: string;
   ipavaulttype?: "standard" | "symmetric" | "asymmetric";
+  password?: string;
+  ipavaultpublickey?: string;
 }
 
 interface VaultsSearchPayload {
@@ -99,6 +101,12 @@ const extendedApi = api.injectEndpoints({
         }
         if (payload.ipavaulttype) {
           params.ipavaulttype = payload.ipavaulttype;
+        }
+        if (payload.password) {
+          params.password = payload.password;
+        }
+        if (payload.ipavaultpublickey) {
+          params.ipavaultpublickey = payload.ipavaultpublickey;
         }
         return getCommand({
           method: "vault_add",

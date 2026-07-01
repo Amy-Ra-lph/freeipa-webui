@@ -31,6 +31,7 @@ import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
 import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Modals
 import AddDelegationModal from "src/components/modals/DelegationModals/AddDelegationModal";
 import DeleteDelegationModal from "src/components/modals/DelegationModals/DeleteDelegationModal";
@@ -38,6 +39,7 @@ import DeleteDelegationModal from "src/components/modals/DelegationModals/Delete
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // Utils
 import { API_VERSION_BACKUP, isDelegationSelectable } from "src/utils/utils";
 // RPC client
@@ -329,6 +331,11 @@ const Delegation = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "delegations",
+  });
+
   const columnNames = [
     "Delegation name",
     "Delegated group",
@@ -357,7 +364,7 @@ const Delegation = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search delegations"
-          placeholder="Search"
+          placeholder="Search delegations"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -411,7 +418,12 @@ const Delegation = () => {
     },
     {
       key: 7,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 8,
@@ -428,7 +440,7 @@ const Delegation = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout
           id="delegation-title"
@@ -513,7 +525,7 @@ const Delegation = () => {
         errors={modalErrors.getAll()}
         dataCy="delegation-modal-error"
       />
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

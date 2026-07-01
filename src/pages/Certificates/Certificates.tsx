@@ -32,10 +32,12 @@ import SearchInputLayout from "src/components/layouts/SearchInputLayout";
 import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Hooks
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // RPC client
 import { useCertFindMutation } from "src/services/rpcCertificates";
 // Errors
@@ -205,6 +207,11 @@ const Certificates = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "certificates",
+  });
+
   const columnNames = [
     "Serial Number",
     "Subject",
@@ -258,7 +265,12 @@ const Certificates = () => {
     },
     {
       key: 4,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 5,
@@ -275,7 +287,7 @@ const Certificates = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout
           id="certificates-title"
@@ -408,7 +420,7 @@ const Certificates = () => {
           </FlexItem>
         </Flex>
       </PageSection>
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

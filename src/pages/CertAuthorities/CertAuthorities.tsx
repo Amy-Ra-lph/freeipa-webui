@@ -34,6 +34,7 @@ import BulkSelectorPrep from "src/components/BulkSelectorPrep";
 // Modals
 import AddCertAuthorityModal from "src/components/modals/CertAuthorityModals/AddCertAuthorityModal";
 import DeleteCertAuthoritiesModal from "src/components/modals/CertAuthorityModals/DeleteCertAuthoritiesModal";
+import EnableDisableCertAuthoritiesModal from "src/components/modals/CertAuthorityModals/EnableDisableCertAuthoritiesModal";
 // Hooks
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
@@ -171,8 +172,13 @@ const CertAuthorities = () => {
 
   const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] =
     useState<boolean>(true);
+  const [isEnableButtonDisabled, setIsEnableButtonDisabled] =
+    useState<boolean>(true);
+  const [isDisableButtonDisabled, setIsDisableButtonDisabled] =
+    useState<boolean>(true);
 
   const [isDeletion, setIsDeletion] = useState(false);
+  const [isDisableEnableOp, setIsDisableEnableOp] = useState(false);
 
   const [selectedPerPage, setSelectedPerPage] = useState<number>(0);
 
@@ -242,6 +248,9 @@ const CertAuthorities = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEnableDisableModal, setShowEnableDisableModal] = useState(false);
+  const [enableDisableOptionSelected, setEnableDisableOptionSelected] =
+    useState(false);
 
   const selectableCertAuthoritiesTable =
     elementsList.filter(isCertAuthoritySelectable);
@@ -279,6 +288,8 @@ const CertAuthorities = () => {
     }
     setSelectedCertAuthorities(newSelectedCas);
     setIsDeleteButtonDisabled(newSelectedCas.length === 0);
+    setIsEnableButtonDisabled(newSelectedCas.length === 0);
+    setIsDisableButtonDisabled(newSelectedCas.length === 0);
   };
 
   const setCertAuthoritySelected = (
@@ -353,7 +364,7 @@ const CertAuthorities = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search certificate authorities"
-          placeholder="Search"
+          placeholder="Search certificate authorities"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -403,14 +414,44 @@ const CertAuthorities = () => {
     },
     {
       key: 6,
-      toolbarItemVariant: ToolbarItemVariant.separator,
+      element: (
+        <SecondaryButton
+          isDisabled={isEnableButtonDisabled || !showTableRows}
+          onClickHandler={() => {
+            setEnableDisableOptionSelected(false);
+            setShowEnableDisableModal(true);
+          }}
+          dataCy="cert-authorities-button-enable"
+        >
+          Enable
+        </SecondaryButton>
+      ),
     },
     {
       key: 7,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <SecondaryButton
+          isDisabled={isDisableButtonDisabled || !showTableRows}
+          onClickHandler={() => {
+            setEnableDisableOptionSelected(true);
+            setShowEnableDisableModal(true);
+          }}
+          dataCy="cert-authorities-button-disable"
+        >
+          Disable
+        </SecondaryButton>
+      ),
     },
     {
       key: 8,
+      toolbarItemVariant: ToolbarItemVariant.separator,
+    },
+    {
+      key: 9,
+      element: <HelpTextWithIconLayout textContent="Help" />,
+    },
+    {
+      key: 10,
       element: (
         <PaginationLayout
           list={elementsList}
@@ -468,6 +509,8 @@ const CertAuthorities = () => {
                         setIsDeleteButtonDisabled,
                       isDeletion,
                       updateIsDeletion: setIsDeletion,
+                      isDisableEnableOp,
+                      updateIsDisableEnableOp: setIsDisableEnableOp,
                     }}
                     paginationData={{
                       selectedPerPage,
@@ -507,6 +550,23 @@ const CertAuthorities = () => {
         updateIsDeleteButtonDisabled={setIsDeleteButtonDisabled}
         updateIsDeletion={setIsDeletion}
       />
+      {showEnableDisableModal && (
+        <EnableDisableCertAuthoritiesModal
+          show={showEnableDisableModal}
+          handleModalToggle={() => setShowEnableDisableModal(false)}
+          optionSelected={enableDisableOptionSelected}
+          selectedCertAuthoritiesData={{
+            selectedCertAuthorities,
+            clearSelectedCertAuthorities,
+          }}
+          buttonsData={{
+            updateIsEnableButtonDisabled: setIsEnableButtonDisabled,
+            updateIsDisableButtonDisabled: setIsDisableButtonDisabled,
+            updateIsDisableEnableOp: setIsDisableEnableOp,
+          }}
+          onRefresh={refreshData}
+        />
+      )}
       <ModalErrors
         errors={modalErrors.getAll()}
         dataCy="cert-authorities-modal-error"

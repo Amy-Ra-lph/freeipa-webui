@@ -31,6 +31,7 @@ import MainTable from "src/components/tables/MainTable";
 // Components
 import PaginationLayout from "src/components/layouts/PaginationLayout";
 import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+import ContextualHelpPanel from "src/components/ContextualHelpPanel/ContextualHelpPanel";
 // Modals
 import AddCACLModal from "src/components/modals/CACLModals/AddCACLModal";
 import DeleteCACLsModal from "src/components/modals/CACLModals/DeleteCACLsModal";
@@ -39,6 +40,7 @@ import EnableDisableCACLsModal from "src/components/modals/CACLModals/EnableDisa
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import { useContextualHelpPanel } from "src/hooks/useContextualHelpPanel";
 // Utils
 import { API_VERSION_BACKUP } from "src/utils/utils";
 // RPC client
@@ -328,6 +330,11 @@ const CACLs = () => {
     submitSearchValue,
   };
 
+  // Contextual links panel
+  const contextualPanel = useContextualHelpPanel({
+    defaultPage: "ca-acls",
+  });
+
   const columnNames = ["ACL name", "Description", "Enabled"];
   const keyNames = ["cn", "description", "ipaenabledflag"];
 
@@ -351,7 +358,7 @@ const CACLs = () => {
           dataCy="search"
           name="search"
           ariaLabel="Search CA ACLs"
-          placeholder="Search"
+          placeholder="Search CA ACLs"
           searchValueData={searchValueData}
           isDisabled={searchDisabled}
         />
@@ -435,7 +442,12 @@ const CACLs = () => {
     },
     {
       key: 9,
-      element: <HelpTextWithIconLayout textContent="Help" />,
+      element: (
+        <HelpTextWithIconLayout
+          textContent="Help"
+          onClick={() => contextualPanel.setIsExpanded((prev) => !prev)}
+        />
+      ),
     },
     {
       key: 10,
@@ -452,7 +464,7 @@ const CACLs = () => {
   ];
 
   return (
-    <div>
+    <ContextualHelpPanel {...contextualPanel.panelProps}>
       <PageSection hasBodyWrapper={false}>
         <TitleLayout id="cacls-title" headingLevel="h1" text="CA ACLs" />
       </PageSection>
@@ -549,7 +561,7 @@ const CACLs = () => {
         />
       )}
       <ModalErrors errors={modalErrors.getAll()} dataCy="cacls-modal-error" />
-    </div>
+    </ContextualHelpPanel>
   );
 };
 

@@ -26,7 +26,7 @@ interface TopologySegmentsTabsProps {
 const TopologySegmentsTabs = ({ section }: TopologySegmentsTabsProps) => {
   const { cn } = useSafeParams<CnParams>(["cn"]);
   const [searchParams] = useSearchParams();
-  const suffixCn = searchParams.get("suffix") || "";
+  const suffixCn = searchParams.get("suffix") || "domain";
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 

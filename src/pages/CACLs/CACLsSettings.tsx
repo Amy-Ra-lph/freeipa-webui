@@ -5,6 +5,7 @@ import {
   Flex,
   Form,
   FormGroup,
+  Label,
   Sidebar,
   SidebarContent,
   SidebarPanel,
@@ -165,7 +166,7 @@ const CACLsSettings = (props: PropsToSettings) => {
           <Flex direction={{ default: "column" }} flex={{ default: "flex_1" }}>
             <TitleLayout
               key={0}
-              headingLevel="h1"
+              headingLevel="h2"
               id="cacl-settings"
               text="CA ACL settings"
             />
@@ -197,16 +198,12 @@ const CACLsSettings = (props: PropsToSettings) => {
                 />
               </FormGroup>
               <FormGroup label="Enabled" fieldId="ipaenabledflag">
-                <IpaTextInput
-                  dataCy="cacls-tab-settings-textinput-ipaenabledflag"
-                  name="ipaenabledflag"
-                  ariaLabel="Enabled"
-                  ipaObject={ipaObject}
-                  onChange={recordOnChange}
-                  objectName="caacl"
-                  metadata={props.metadata}
-                  readOnly
-                />
+                <Label
+                  data-cy="cacls-tab-settings-label-ipaenabledflag"
+                  color={ipaObject.ipaenabledflag ? "green" : "red"}
+                >
+                  {ipaObject.ipaenabledflag ? "Enabled" : "Disabled"}
+                </Label>
               </FormGroup>
               <FormGroup label="CA category" fieldId="ipacacategory">
                 <IpaTextInput
