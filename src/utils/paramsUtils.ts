@@ -9,8 +9,16 @@ export type CnParams = {
   cn: string;
 };
 
+export type AcinameParams = {
+  aciname: string;
+};
+
 export type IpatokenuniqueidParams = {
   ipatokenuniqueid: string;
+};
+
+export type IdnsnameParams = {
+  idnsname: string;
 };
 
 type Params = Record<string, string | undefined>;

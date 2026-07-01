@@ -55,6 +55,13 @@ const IdentityProviderReferencesGroupRef = "identity-provider-references";
 const CertificateMappingGroupRef = "cert-id-mapping-rules";
 const CertificateMappingConfigGroupRef = "cert-id-mapping-global-config";
 const CertificateMappingMatchGroupRef = "cert-id-mapping-match";
+// - Certificates
+const CertificatesGroupRef = "certificates";
+const CertProfilesGroupRef = "cert-profiles";
+const CertAuthoritiesGroupRef = "cert-authorities";
+const CACLsGroupRef = "ca-acls";
+// - RADIUS
+const RadiusServersGroupRef = "radius-servers";
 // NETWORK SERVICES
 // - Automount
 const AutomountLocationsGroupRef = "automount-locations";
@@ -69,8 +76,20 @@ const TrustsGroupRef = "trusts";
 const TrustsGlobalConfigGroupRef = "trusts-config";
 // - Topology
 const TopologyGroupRef = "topology-graph";
+const TopologySuffixesGroupRef = "topology-suffixes";
+const TopologySegmentsGroupRef = "topology-segments";
+// - Locations
+const LocationsGroupRef = "locations";
+// - Realm Domains
+const RealmDomainsGroupRef = "realm-domains";
+// - Vaults
+const VaultsGroupRef = "vaults";
 // - Role-based access control
 const RbacGroupRef = "rbac";
+const PrivilegesGroupRef = "privileges";
+const PermissionsGroupRef = "permissions";
+const SelfServiceGroupRef = "self-service";
+const DelegationGroupRef = "delegation";
 // - Configuration
 const ConfigRef = "configuration";
 
@@ -361,6 +380,49 @@ export const getNavigationRoutes = (
             },
           ],
         },
+        {
+          label: "Certificates",
+          group: CertificatesGroupRef,
+          title: `${BASE_TITLE} - Certificates`,
+          path: "",
+          items: [
+            {
+              label: "Certificates",
+              group: CertificatesGroupRef,
+              title: `${BASE_TITLE} - Certificates`,
+              path: "certificates",
+              items: [],
+            },
+            {
+              label: "Certificate profiles",
+              group: CertProfilesGroupRef,
+              title: `${BASE_TITLE} - Certificate profiles`,
+              path: "cert-profiles",
+              items: [],
+            },
+            {
+              label: "Certificate authorities",
+              group: CertAuthoritiesGroupRef,
+              title: `${BASE_TITLE} - Certificate authorities`,
+              path: "cert-authorities",
+              items: [],
+            },
+            {
+              label: "CA ACLs",
+              group: CACLsGroupRef,
+              title: `${BASE_TITLE} - CA ACLs`,
+              path: "ca-acls",
+              items: [],
+            },
+          ],
+        },
+        {
+          label: "RADIUS servers",
+          group: RadiusServersGroupRef,
+          title: `${BASE_TITLE} - RADIUS servers`,
+          path: "radius-servers",
+          items: [],
+        },
       ],
     },
     {
@@ -437,6 +499,34 @@ export const getNavigationRoutes = (
               path: "roles",
               items: [],
             },
+            {
+              label: "Privileges",
+              group: PrivilegesGroupRef,
+              title: `${BASE_TITLE} - Privileges`,
+              path: "privileges",
+              items: [],
+            },
+            {
+              label: "Permissions",
+              group: PermissionsGroupRef,
+              title: `${BASE_TITLE} - Permissions`,
+              path: "permissions",
+              items: [],
+            },
+            {
+              label: "Self service permissions",
+              group: SelfServiceGroupRef,
+              title: `${BASE_TITLE} - Self service permissions`,
+              path: "self-service",
+              items: [],
+            },
+            {
+              label: "Delegations",
+              group: DelegationGroupRef,
+              title: `${BASE_TITLE} - Delegations`,
+              path: "delegation",
+              items: [],
+            },
           ],
         },
         {
@@ -472,7 +562,7 @@ export const getNavigationRoutes = (
           label: "Topology",
           group: TopologyGroupRef,
           title: `${BASE_TITLE} - Topology`,
-          path: "topology-graph",
+          path: "",
           items: [
             {
               label: "Topology graph",
@@ -481,7 +571,42 @@ export const getNavigationRoutes = (
               path: "topology-graph",
               items: [],
             },
+            {
+              label: "Topology suffixes",
+              group: TopologySuffixesGroupRef,
+              title: `${BASE_TITLE} - Topology suffixes`,
+              path: "topology-suffixes",
+              items: [],
+            },
+            {
+              label: "Topology segments",
+              group: TopologySegmentsGroupRef,
+              title: `${BASE_TITLE} - Topology segments`,
+              path: "topology-segments",
+              items: [],
+            },
           ],
+        },
+        {
+          label: "Locations",
+          group: LocationsGroupRef,
+          title: `${BASE_TITLE} - Locations`,
+          path: "locations",
+          items: [],
+        },
+        {
+          label: "Realm domains",
+          group: RealmDomainsGroupRef,
+          title: `${BASE_TITLE} - Realm domains`,
+          path: "realm-domains",
+          items: [],
+        },
+        {
+          label: "Vaults",
+          group: VaultsGroupRef,
+          title: `${BASE_TITLE} - Vaults`,
+          path: "vaults",
+          items: [],
         },
         {
           label: "Configuration",

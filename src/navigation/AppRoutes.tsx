@@ -81,6 +81,32 @@ import TopologyGraph from "src/pages/Topology/TopologyGraph";
 import OtpTokensTabs from "src/pages/OtpTokens/OtpTokensTabs";
 import Roles from "src/pages/Roles/Roles";
 import RolesTabs from "src/pages/Roles/RolesTabs";
+import RadiusServers from "src/pages/RadiusServers/RadiusServers";
+import RadiusServersTabs from "src/pages/RadiusServers/RadiusServersTabs";
+import Privileges from "src/pages/Privileges/Privileges";
+import PrivilegesTabs from "src/pages/Privileges/PrivilegesTabs";
+import Permissions from "src/pages/Permissions/Permissions";
+import PermissionsTabs from "src/pages/Permissions/PermissionsTabs";
+import SelfService from "src/pages/SelfService/SelfService";
+import SelfServiceTabs from "src/pages/SelfService/SelfServiceTabs";
+import Delegation from "src/pages/Delegation/Delegation";
+import DelegationTabs from "src/pages/Delegation/DelegationTabs";
+import Locations from "src/pages/Locations/Locations";
+import LocationsTabs from "src/pages/Locations/LocationsTabs";
+import Certificates from "src/pages/Certificates/Certificates";
+import CertProfiles from "src/pages/CertProfiles/CertProfiles";
+import CertProfilesTabs from "src/pages/CertProfiles/CertProfilesTabs";
+import CertAuthorities from "src/pages/CertAuthorities/CertAuthorities";
+import CertAuthoritiesTabs from "src/pages/CertAuthorities/CertAuthoritiesTabs";
+import CACLs from "src/pages/CACLs/CACLs";
+import CACLsTabs from "src/pages/CACLs/CACLsTabs";
+import Vaults from "src/pages/Vaults/Vaults";
+import VaultsTabs from "src/pages/Vaults/VaultsTabs";
+import TopologySuffixes from "src/pages/TopologySuffixes/TopologySuffixes";
+import TopologySuffixesTabs from "src/pages/TopologySuffixes/TopologySuffixesTabs";
+import TopologySegments from "src/pages/TopologySegments/TopologySegments";
+import TopologySegmentsTabs from "src/pages/TopologySegments/TopologySegmentsTabs";
+import RealmDomains from "src/pages/RealmDomains/RealmDomains";
 
 // Renders routes (React)
 export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
@@ -562,6 +588,15 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
               <Route path="topology-graph">
                 <Route path="" element={<TopologyGraph />} />
               </Route>
+              <Route path="locations">
+                <Route path="" element={<Locations />} />
+                <Route path=":idnsname">
+                  <Route
+                    path=""
+                    element={<LocationsTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
               <Route path="roles">
                 <Route path="" element={<Roles />} />
                 <Route path=":cn">
@@ -595,6 +630,123 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
                     element={<RolesTabs section="member_sysaccount" />}
                   />
                 </Route>
+              </Route>
+              <Route path="radius-servers">
+                <Route path="" element={<RadiusServers />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<RadiusServersTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="privileges">
+                <Route path="" element={<Privileges />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<PrivilegesTabs section="settings" />}
+                  />
+                  <Route
+                    path="member_role"
+                    element={<PrivilegesTabs section="member_role" />}
+                  />
+                  <Route
+                    path="memberof_permission"
+                    element={<PrivilegesTabs section="memberof_permission" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="permissions">
+                <Route path="" element={<Permissions />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<PermissionsTabs section="settings" />}
+                  />
+                  <Route
+                    path="member_privilege"
+                    element={<PermissionsTabs section="member_privilege" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="self-service">
+                <Route path="" element={<SelfService />} />
+                <Route path=":aciname">
+                  <Route
+                    path=""
+                    element={<SelfServiceTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="delegation">
+                <Route path="" element={<Delegation />} />
+                <Route path=":aciname">
+                  <Route
+                    path=""
+                    element={<DelegationTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="certificates">
+                <Route path="" element={<Certificates />} />
+              </Route>
+              <Route path="cert-profiles">
+                <Route path="" element={<CertProfiles />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<CertProfilesTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="cert-authorities">
+                <Route path="" element={<CertAuthorities />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<CertAuthoritiesTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="ca-acls">
+                <Route path="" element={<CACLs />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<CACLsTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="vaults">
+                <Route path="" element={<Vaults />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<VaultsTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="topology-suffixes">
+                <Route path="" element={<TopologySuffixes />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<TopologySuffixesTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="topology-segments">
+                <Route path="" element={<TopologySegments />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<TopologySegmentsTabs section="settings" />}
+                  />
+                </Route>
+              </Route>
+              <Route path="realm-domains">
+                <Route path="" element={<RealmDomains />} />
               </Route>
               <Route path="configuration" element={<Configuration />} />
               {/* Redirect to Active users page if user is logged in and navigates to the root page */}

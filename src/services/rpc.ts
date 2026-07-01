@@ -16,6 +16,7 @@ import {
   roleType,
   sudoCmdType,
   automemberType,
+  acinameType,
 } from "../utils/datatypes/globalDataTypes";
 
 interface ShowRPCResponse {
@@ -162,7 +163,8 @@ export interface GenericPayload {
     | "idview"
     | "idoverrideuser"
     | "idoverridegroup"
-    | "automember";
+    | "automember"
+    | "selfservice";
 }
 
 export interface GetEntriesPayload {
@@ -442,6 +444,8 @@ export const api = createApi({
             id = idResponseData.result.result[i] as roleType;
           } else if (objName === "sudocmd") {
             id = idResponseData.result.result[i] as sudoCmdType;
+          } else if (objName === "delegation" || objName === "selfservice") {
+            id = idResponseData.result.result[i] as acinameType;
           } else {
             // Unknown, should never happen
             return {
@@ -461,7 +465,11 @@ export const api = createApi({
         // 2ND CALL - GET PARTIAL INFO
         // Prepare payload
         let payloadDataBatch: Command[] = [];
-        if (objName === "idview") {
+        if (
+          objName === "idview" ||
+          objName === "delegation" ||
+          objName === "selfservice"
+        ) {
           // There is no "no_members" param
           payloadDataBatch = ids.map((name) => ({
             method: objName + "_show",

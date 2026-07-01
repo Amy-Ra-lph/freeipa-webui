@@ -32,6 +32,15 @@ import {
   OtpToken,
   SELinuxUserMap,
   AutomountLocation,
+  Privilege,
+  Permission,
+  SelfServicePermission,
+  DelegationPermission,
+  RadiusServer,
+  Vault,
+  Location,
+  TopologySuffix,
+  TopologySegment,
 } from "./datatypes/globalDataTypes";
 // Errors
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
@@ -244,6 +253,32 @@ export const isOtpTokenSelectable = (otpToken: OtpToken) =>
 
 export const isSelinuxUserMapSelectable = (map: SELinuxUserMap) =>
   map.cn !== "";
+
+export const isPrivilegeSelectable = (privilege: Privilege) =>
+  privilege.cn !== "";
+
+export const isPermissionSelectable = (permission: Permission) =>
+  permission.cn !== "";
+
+export const isSelfServiceSelectable = (selfService: SelfServicePermission) =>
+  selfService.aciname !== "";
+
+export const isDelegationSelectable = (delegation: DelegationPermission) =>
+  delegation.aciname !== "";
+
+export const isRadiusServerSelectable = (server: RadiusServer) =>
+  server.cn !== "";
+
+export const isVaultSelectable = (vault: Vault) => vault.cn !== "";
+
+export const isLocationSelectable = (location: Location) =>
+  location.idnsname !== "";
+
+export const isTopologySuffixSelectable = (suffix: TopologySuffix) =>
+  suffix.cn !== "";
+
+export const isTopologySegmentSelectable = (segment: TopologySegment) =>
+  segment.cn !== "";
 
 /**
  * Write JSX error messages into 'apiErrorsJsx' array

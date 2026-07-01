@@ -637,6 +637,11 @@ export interface dnsZoneType {
   idnsname: string[];
 }
 
+export interface acinameType {
+  dn: string;
+  aciname: string[];
+}
+
 export interface automemberType {
   cn: string;
   automembertargetgroup: string;
@@ -1249,5 +1254,91 @@ export interface IpaServer {
   ipaserviceweight: number; // Maximum value: 65535
   service_relative_weight: string;
   enabled_role_servrole: string[];
+  dn: string;
+}
+
+export interface Privilege {
+  cn: string;
+  description: string;
+  dn: string;
+  member_role: string[];
+  memberof_permission: string[];
+}
+
+export interface Permission {
+  cn: string;
+  description: string;
+  dn: string;
+  ipapermright: string[];
+  ipapermbindruletype: string;
+  ipapermlocation: string;
+  ipapermtarget: string;
+  ipapermtargetfilter: string;
+  ipapermtargetto: string;
+  ipapermtargetfrom: string;
+  extratargetfilter: string[];
+  attrs: string[];
+  type: string;
+  memberof: string;
+  member_privilege: string[];
+}
+
+export interface SelfServicePermission {
+  aciname: string;
+  attrs: string[];
+  dn: string;
+}
+
+export interface DelegationPermission {
+  aciname: string;
+  attrs: string[];
+  group: string;
+  memberof: string;
+  permissions: string[];
+  dn: string;
+}
+
+export interface Vault {
+  cn: string;
+  description: string;
+  ipavaulttype: "standard" | "symmetric" | "asymmetric";
+  ipavaultsalt: string;
+  ipavaultpublickey: string;
+  owner_user: string[];
+  owner_group: string[];
+  owner_service: string[];
+  member_user: string[];
+  member_group: string[];
+  member_service: string[];
+  dn: string;
+}
+
+export interface Location {
+  idnsname: string;
+  description: string;
+  servers_server: string[];
+  dn: string;
+}
+
+export interface RealmDomain {
+  associateddomain: string[];
+}
+
+export interface CertACL {
+  cn: string;
+  description: string;
+  ipaenabledflag: boolean;
+  ipacacategory: string;
+  ipacertprofilecategory: string;
+  usercategory: string;
+  hostcategory: string;
+  servicecategory: string;
+  ipamemberca_ca: string[];
+  ipamembercertprofile_certprofile: string[];
+  memberuser_user: string[];
+  memberuser_group: string[];
+  memberhost_host: string[];
+  memberhost_hostgroup: string[];
+  memberservice_service: string[];
   dn: string;
 }

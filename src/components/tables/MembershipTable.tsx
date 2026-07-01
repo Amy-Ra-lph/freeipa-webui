@@ -54,6 +54,7 @@ type FromTypes =
   | "host-groups"
   | "idoverrideuser"
   | "netgroups"
+  | "privileges"
   | "roles"
   | "services"
   | "sudo-rules"
@@ -74,7 +75,12 @@ interface MemberTableProps {
 }
 
 // Types that use string arrays instead of objects
-const STRING_ARRAY_TYPES = ["external", "sysaccount", "idoverrideuser"];
+const STRING_ARRAY_TYPES = [
+  "external",
+  "sysaccount",
+  "idoverrideuser",
+  "privileges",
+];
 
 // Body
 const TableBody = (props: {
