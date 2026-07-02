@@ -260,6 +260,57 @@ export interface HBACServiceGroup {
   member_hbacsvc: string[];
 }
 
+export interface OAuth2Delegation {
+  cn: string;
+  description: string;
+  oauth2delegatesource: string;
+  oauth2delegatetarget: string[];
+  oauth2delegatescope: string[];
+  oauth2delegatehostgroup: string[];
+  oauth2delegateservice: string[];
+  oauth2delegatenotafter: string;
+  oauth2requireattestation: boolean;
+  oauth2enabled: boolean;
+  dn: string;
+}
+
+export interface OAuth2Client {
+  cn: string;
+  description: string;
+  oauth2clientid: string;
+  oauth2clienttype: string;
+  oauth2granttype: string[];
+  oauth2redirecturi: string[];
+  oauth2scope: string[];
+  oauth2tokenlifetime: string;
+  oauth2enabled: boolean;
+  dn: string;
+}
+
+export interface OAuth2Scope {
+  cn: string;
+  description: string;
+  oauth2scope: string;
+  oauth2enabled: boolean;
+  dn: string;
+}
+
+export interface OAuth2Workload {
+  cn: string;
+  description: string;
+  oauth2workloadtype: string;
+  oauth2spiffeid: string;
+  oauth2workloadowner: string;
+  oauth2workloadclient: string;
+  oauth2workloadserviceprincipal: string;
+  oauth2workloadmaxtokenlifetime: string;
+  oauth2workloadvendor: string;
+  oauth2workloadskill: string[];
+  oauth2workloadcardttl: string;
+  oauth2enabled: boolean;
+  dn: string;
+}
+
 export interface SudoRulesOld {
   name: string;
   status: string;

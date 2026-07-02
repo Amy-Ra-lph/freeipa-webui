@@ -264,6 +264,10 @@ export const api = createApi({
     "FullOverrideUser",
     "FullOverrideGroup",
     "FullAutomember",
+    "FullOAuth2Delegation",
+    "FullOAuth2Client",
+    "FullOAuth2Scope",
+    "FullOAuth2Workload",
   ],
   endpoints: (build) => ({
     simpleMutCommand: build.mutation<
