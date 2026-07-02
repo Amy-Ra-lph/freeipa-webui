@@ -108,9 +108,13 @@ import TopologySegments from "src/pages/TopologySegments/TopologySegments";
 import TopologySegmentsTabs from "src/pages/TopologySegments/TopologySegmentsTabs";
 import RealmDomains from "src/pages/RealmDomains/RealmDomains";
 import Workloads from "src/pages/Workloads/Workloads";
+import WorkloadsTabs from "src/pages/Workloads/WorkloadsTabs";
 import OAuth2Clients from "src/pages/OAuth2Clients/OAuth2Clients";
+import OAuth2ClientsTabs from "src/pages/OAuth2Clients/OAuth2ClientsTabs";
 import OAuth2Scopes from "src/pages/OAuth2Scopes/OAuth2Scopes";
+import OAuth2ScopesTabs from "src/pages/OAuth2Scopes/OAuth2ScopesTabs";
 import OAuth2Delegations from "src/pages/OAuth2Delegations/OAuth2Delegations";
+import OAuth2DelegationsTabs from "src/pages/OAuth2Delegations/OAuth2DelegationsTabs";
 import SpiffeEntries from "src/pages/SpiffeEntries/SpiffeEntries";
 import TopologyNodes from "src/pages/TopologyNodes/TopologyNodes";
 import TopologyReplicas from "src/pages/TopologyReplicas/TopologyReplicas";
@@ -760,15 +764,39 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
               </Route>
               <Route path="workloads">
                 <Route path="" element={<Workloads />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<WorkloadsTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="oauth2-clients">
                 <Route path="" element={<OAuth2Clients />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2ClientsTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="oauth2-scopes">
                 <Route path="" element={<OAuth2Scopes />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2ScopesTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="oauth2-delegations">
                 <Route path="" element={<OAuth2Delegations />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<OAuth2DelegationsTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="spiffe-entries">
                 <Route path="" element={<SpiffeEntries />} />
