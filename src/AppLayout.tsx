@@ -19,7 +19,6 @@ import {
   ToolbarItem,
   ToolbarGroup,
   ToolbarContent,
-  Brand,
 } from "@patternfly/react-core";
 import React from "react";
 // Icons
@@ -31,8 +30,9 @@ import { ShareSquareIcon } from "@patternfly/react-icons";
 // Navigation
 import Navigation from "./navigation/Nav";
 // Images
-import headerLogo from "/assets/images/header-logo.png";
 import avatarImg from "/assets/images/avatarImg.svg";
+// Logo
+import IpaLogo from "./components/IpaLogo";
 // Redux
 import { useAppDispatch } from "./store/hooks";
 import { setIsLogout } from "./store/Global/auth-slice";
@@ -185,11 +185,7 @@ const AppLayout = (props: PropsToAppLayout) => {
         </MastheadToggle>
         <MastheadBrand>
           <MastheadLogo className="pf-v6-u-display-flex">
-            <Brand
-              src={headerLogo}
-              alt="IPA Logo"
-              className="pf-v6-u-my-auto"
-            />
+            <IpaLogo className="pf-v6-u-my-auto" />
           </MastheadLogo>
         </MastheadBrand>
       </MastheadMain>

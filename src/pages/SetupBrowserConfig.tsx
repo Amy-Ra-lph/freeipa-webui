@@ -7,7 +7,6 @@ import {
   MastheadMain,
   MastheadLogo,
   MastheadBrand,
-  Brand,
   List,
   ListComponent,
   OrderType,
@@ -15,8 +14,8 @@ import {
   ExpandableSection,
   Content,
 } from "@patternfly/react-core";
-// Images
-import HeaderLogo from "/assets/images/header-logo.png";
+// Logo
+import IpaLogo from "src/components/IpaLogo";
 // Components
 import TitleLayout from "src/components/layouts/TitleLayout";
 //
@@ -43,7 +42,7 @@ const SetupBrowserConfig = () => {
           <MastheadLogo>
             <MastheadBrand>
               <MastheadLogo>
-                <Brand src={HeaderLogo} alt="FreeIPA" />
+                <IpaLogo />
               </MastheadLogo>
             </MastheadBrand>
           </MastheadLogo>
