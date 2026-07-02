@@ -445,7 +445,8 @@ export const api = createApi({
             objName === "oauth2client" ||
             objName === "oauth2scope" ||
             objName === "oauth2workload" ||
-            objName === "oauth2delegation"
+            objName === "oauth2delegation" ||
+            objName === "topologysuffix"
           ) {
             id = idResponseData.result.result[i] as cnType;
           } else if (objName === "role") {
@@ -480,7 +481,8 @@ export const api = createApi({
           objName === "oauth2client" ||
           objName === "oauth2scope" ||
           objName === "oauth2workload" ||
-          objName === "oauth2delegation"
+          objName === "oauth2delegation" ||
+          objName === "topologysuffix"
         ) {
           // There is no "no_members" param
           payloadDataBatch = ids.map((name) => ({
