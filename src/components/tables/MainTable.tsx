@@ -56,7 +56,6 @@ interface PropsToTable<T> {
   buttonsData?: ButtonsData;
   paginationData?: PaginationData;
   statusElementName?: string; // This will be used to determine the status and style the table rows (grey if disabled)
-  invertStatusValue?: boolean; // Sometimes the status is assumed "enabled" (i.e. `ipaenabledflag`) and others is "disabled" (i.e. `ipatokendisabled`)
 }
 
 const MainTable = <T,>(props: PropsToTable<T>) => {
@@ -131,14 +130,6 @@ const MainTable = <T,>(props: PropsToTable<T>) => {
     }
   };
 
-  // Helper function: Check if the status value is inverted
-  const invertStatusValue = (value: boolean) => {
-    if (props.invertStatusValue) {
-      return !value;
-    }
-    return value;
-  };
-
   // Reset 'selectedElements array if a delete operation has been done
   React.useEffect(() => {
     if (props.buttonsData?.isDeletion) {
@@ -165,14 +156,14 @@ const MainTable = <T,>(props: PropsToTable<T>) => {
 
       if (updateIsDisableButtonDisabled && updateIsEnableButtonDisabled) {
         if (equalStatus) {
-          const isEnabled = invertStatusValue(
-            selectedElements[0][props.statusElementName].toString() === "true"
-          );
-
-          if (isEnabled) {
+          const ipaenabledflag: string =
+            selectedElements[0][props.statusElementName];
+          if (ipaenabledflag === "true") {
+            // Enabled
             updateIsDisableButtonDisabled(false);
             updateIsEnableButtonDisabled(true);
-          } else {
+          } else if (ipaenabledflag === "false") {
+            // Disabled
             updateIsDisableButtonDisabled(true);
             updateIsEnableButtonDisabled(false);
           }
@@ -259,26 +250,22 @@ const MainTable = <T,>(props: PropsToTable<T>) => {
     </Tr>
   );
 
-  // Helper method: Set styles depending on the status
-  const setStyleOnStatus = (keyName: string, status: boolean | string) => {
-    if (keyName === props.statusElementName) {
-      const isEnabled = invertStatusValue(status.toString() === "true");
+  type Status = "true" | "false";
 
-      return {
-        color: isEnabled
-          ? "var(--pf-t--global--text--color--regular)"
-          : "var(--pf-t--global--text--color--disabled)",
-      };
-    }
-    return { color: "var(--pf-t--global--text--color--regular)" };
+  // Helper method: Set styles depending on the status
+  const setStyleOnStatus = (status: Status) => {
+    const isEnabled = status === "true";
+    return {
+      color: isEnabled
+        ? "var(--pf-t--global--text--color--regular)"
+        : "var(--pf-t--global--text--color--disabled)",
+    };
   };
 
   // Helper function to process boolean elements and return a string
   // (used for displaying statuses values in the table)
   const processBoolean = (value: boolean | string) => {
-    const isEnabled = invertStatusValue(value.toString() === "true");
-
-    if (!isEnabled) {
+    if (value === "false" || value === false) {
       return (
         <>
           <MinusIcon key="minus-icon" /> {" Disabled"}
@@ -337,7 +324,7 @@ const MainTable = <T,>(props: PropsToTable<T>) => {
               dataLabel={columnNames[keyName]}
               key={keyName + "-" + idx + "-" + elementName}
               id={idx.toString()}
-              style={setStyleOnStatus(keyName, element[keyName])}
+              style={setStyleOnStatus(element[keyName])}
               aria-label={keyName}
               data-label={keyName}
               data-cy={`table-row-${elementName}-${keyName}`}

@@ -202,7 +202,9 @@ const UsersTable = (props: PropsToTable) => {
 
   // Helper method: Set styles depending on the status
   const setStyleOnStatus = (status: boolean) => {
-    return status ? { color: "grey" } : { color: "black" };
+    return status
+      ? { color: "var(--pf-t--global--text--color--disabled)" }
+      : { color: "var(--pf-t--global--text--color--regular)" };
   };
 
   // Defining table header and body from here to avoid passing specific names to the Table Layout

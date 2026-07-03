@@ -91,7 +91,6 @@ code {
     opacity: 0.3;
   }
 }
-
 /*
  * Dark mode: PF6 6.4.0 has dark-context tokens (--pf-t--global--dark--*)
  * for masthead/sidebar but no full dark theme. We remap the regular semantic

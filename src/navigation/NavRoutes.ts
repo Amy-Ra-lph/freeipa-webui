@@ -52,6 +52,11 @@ const KerberosTicketPolicyGroupRef = "kerberos-ticket-policy";
 // AUTHENTICATION
 const OtpTokensGroupRef = "otp-tokens";
 const IdentityProviderReferencesGroupRef = "identity-provider-references";
+const OAuth2ClientsGroupRef = "oauth2-clients";
+const OAuth2ScopesGroupRef = "oauth2-scopes";
+const OAuth2WorkloadsGroupRef = "oauth2-workloads";
+const OAuth2DelegationsGroupRef = "oauth2-delegations";
+const OAuth2VendorsGroupRef = "oauth2-vendors";
 const CertificateMappingGroupRef = "cert-id-mapping-rules";
 const CertificateMappingConfigGroupRef = "cert-id-mapping-global-config";
 const CertificateMappingMatchGroupRef = "cert-id-mapping-match";
@@ -402,6 +407,84 @@ export const getNavigationRoutes = (
           title: `${BASE_TITLE} - Identity Provider references`,
           path: "identity-provider-references",
           items: [],
+        },
+        {
+          label: "OAuth2 / OIDC",
+          group: OAuth2ClientsGroupRef,
+          title: `${BASE_TITLE} - OAuth2 / OIDC`,
+          path: "",
+          items: [
+            {
+              label: "OAuth2 clients",
+              group: OAuth2ClientsGroupRef,
+              title: `${BASE_TITLE} - OAuth2 clients`,
+              path: "oauth2-clients",
+              items: [
+                {
+                  label: "OAuth2 client Settings",
+                  group: OAuth2ClientsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-clients/:cn",
+                },
+              ],
+            },
+            {
+              label: "OAuth2 scopes",
+              group: OAuth2ScopesGroupRef,
+              title: `${BASE_TITLE} - OAuth2 scopes`,
+              path: "oauth2-scopes",
+              items: [
+                {
+                  label: "OAuth2 scope Settings",
+                  group: OAuth2ScopesGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-scopes/:cn",
+                },
+              ],
+            },
+            {
+              label: "Workload identities",
+              group: OAuth2WorkloadsGroupRef,
+              title: `${BASE_TITLE} - Workload identities`,
+              path: "oauth2-workloads",
+              items: [
+                {
+                  label: "Workload identity Settings",
+                  group: OAuth2WorkloadsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-workloads/:cn",
+                },
+              ],
+            },
+            {
+              label: "Delegation rules",
+              group: OAuth2DelegationsGroupRef,
+              title: `${BASE_TITLE} - Delegation rules`,
+              path: "oauth2-delegations",
+              items: [
+                {
+                  label: "Delegation rule Settings",
+                  group: OAuth2DelegationsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-delegations/:cn",
+                },
+              ],
+            },
+            {
+              label: "Trusted vendors",
+              group: OAuth2VendorsGroupRef,
+              title: `${BASE_TITLE} - Trusted vendors`,
+              path: "oauth2-vendors",
+              items: [
+                {
+                  label: "Trusted vendor Settings",
+                  group: OAuth2VendorsGroupRef,
+                  title: `${BASE_TITLE} - Settings`,
+                  path: "oauth2-vendors/:cn",
+                },
+              ],
+            },
+          ],
         },
         {
           label: "Certificate mapping",
