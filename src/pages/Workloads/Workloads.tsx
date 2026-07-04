@@ -16,8 +16,8 @@ import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
 import { useAppSelector } from "src/store/hooks";
 import { API_VERSION_BACKUP } from "src/utils/utils";
-import { GenericPayload } from "src/services/rpc";
-import { useGettingOAuth2WorkloadsQuery } from "src/services/rpcOAuth2";
+
+import { useGetOAuth2WorkloadEntriesQuery } from "src/services/rpcOAuth2";
 
 interface OAuth2Workload {
   dn: string;
@@ -49,13 +49,13 @@ const Workloads = () => {
   const firstIdx = (page - 1) * perPage;
   const lastIdx = page * perPage;
 
-  const workloadsDataResponse = useGettingOAuth2WorkloadsQuery({
+  const workloadsDataResponse = useGetOAuth2WorkloadEntriesQuery({
     searchValue: "",
-    sizeLimit: 0,
+    sizelimit: 0,
     apiVersion: apiVersion || API_VERSION_BACKUP,
     startIdx: firstIdx,
     stopIdx: lastIdx,
-  } as GenericPayload);
+  });
 
   const {
     data: batchResponse,

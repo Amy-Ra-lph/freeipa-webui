@@ -506,7 +506,6 @@ const OtpTokens = () => {
                       updateSelectedPerPage: setSelectedPerPage,
                     }}
                     statusElementName="ipatokendisabled"
-                    invertStatusValue={true}
                   />
                 )}
               </InnerScrollContainer>

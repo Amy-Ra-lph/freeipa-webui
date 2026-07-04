@@ -1,35 +1,65 @@
-import React, { useEffect, useState } from "react";
-import { PageSection, PaginationVariant } from "@patternfly/react-core";
+import React from "react";
+// PatternFly
+import {
+  Flex,
+  FlexItem,
+  PageSection,
+  PaginationVariant,
+  ToolbarItemVariant,
+} from "@patternfly/react-core";
 import {
   InnerScrollContainer,
   OuterScrollContainer,
 } from "@patternfly/react-table";
-import TitleLayout from "src/components/layouts/TitleLayout";
+// Hooks
+import useUpdateRoute from "src/hooks/useUpdateRoute";
+import useListPageSearchParams from "src/hooks/useListPageSearchParams";
+import useApiError from "src/hooks/useApiError";
+// Redux
+import { useAppDispatch, useAppSelector } from "src/store/hooks";
+import { addAlert } from "src/store/Global/alerts-slice";
+// RPC
+import {
+  useGetOAuth2DelegationEntriesQuery,
+  useSearchOAuth2DelegationEntriesMutation,
+} from "src/services/rpcOAuth2";
+// Components
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { SerializedError } from "@reduxjs/toolkit";
 import ToolbarLayout, {
   ToolbarItem,
 } from "src/components/layouts/ToolbarLayout";
 import SearchInputLayout from "src/components/layouts/SearchInputLayout";
 import SecondaryButton from "src/components/layouts/SecondaryButton";
+import HelpTextWithIconLayout from "src/components/layouts/HelpTextWithIconLayout";
 import PaginationLayout from "src/components/layouts/PaginationLayout";
+import TitleLayout from "src/components/layouts/TitleLayout";
+import GlobalErrors from "src/components/errors/GlobalErrors";
 import MainTable from "src/components/tables/MainTable";
-import useUpdateRoute from "src/hooks/useUpdateRoute";
-import useListPageSearchParams from "src/hooks/useListPageSearchParams";
-import { useAppSelector } from "src/store/hooks";
-import { API_VERSION_BACKUP } from "src/utils/utils";
-import { GenericPayload } from "src/services/rpc";
-import { useGettingOAuth2DelegationsQuery } from "src/services/rpcOAuth2";
+import BulkSelectorPrep from "src/components/BulkSelectorPrep";
+// Modals
+import AddOAuth2DelegationModal from "src/components/modals/OAuth2/AddDelegationModal";
+import DeleteOAuth2DelegationModal from "src/components/modals/OAuth2/DeleteDelegationModal";
 
 interface OAuth2Delegation {
+  cn: string;
   dn: string;
-  cn: string[];
-  oauth2delegatesource?: string[];
-  oauth2delegatetarget?: string[];
-  oauth2delegatescope?: string[];
+  oauth2delegatesource: string[];
+  oauth2delegatetarget: string[];
+  oauth2delegatescope: string[];
+  oauth2delegateservice: string[];
+  oauth2enabled: string[];
 }
 
+const isOAuth2DelegationSelectable = (delegation: OAuth2Delegation) =>
+  delegation.cn !== undefined;
+
 const OAuth2Delegations = () => {
-  const [delegationsList, setDelegationsList] = useState<OAuth2Delegation[]>([]);
-  const { browserTitle } = useUpdateRoute({ pathname: "oauth2-delegations" });
+  const dispatch = useAppDispatch();
+
+  const { browserTitle } = useUpdateRoute({
+    pathname: "oauth2-delegations",
+  });
 
   React.useEffect(() => {
     document.title = browserTitle;
@@ -42,65 +72,176 @@ const OAuth2Delegations = () => {
   const { page, setPage, perPage, setPerPage, searchValue, setSearchValue } =
     useListPageSearchParams();
 
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [showTableRows, setShowTableRows] = useState(false);
+  const globalErrors = useApiError([]);
 
   const firstIdx = (page - 1) * perPage;
   const lastIdx = page * perPage;
 
-  const delegationsDataResponse = useGettingOAuth2DelegationsQuery({
-    searchValue: "",
-    sizeLimit: 0,
-    apiVersion: apiVersion || API_VERSION_BACKUP,
+  const [delegations, setDelegations] = React.useState<OAuth2Delegation[]>([]);
+  const [isSearchDisabled, setIsSearchDisabled] = React.useState(false);
+  const [totalCount, setTotalCount] = React.useState(0);
+
+  const delegationsResponse = useGetOAuth2DelegationEntriesQuery({
+    searchValue: searchValue,
+    apiVersion,
+    sizelimit: 100,
     startIdx: firstIdx,
     stopIdx: lastIdx,
-  } as GenericPayload);
+  });
 
-  const {
-    data: batchResponse,
-    isLoading: isBatchLoading,
-  } = delegationsDataResponse;
+  const { data, isLoading, error } = delegationsResponse;
 
-  useEffect(() => {
-    if (delegationsDataResponse.isFetching) {
+  React.useEffect(() => {
+    if (delegationsResponse.isFetching) {
       setShowTableRows(false);
       setTotalCount(0);
+      globalErrors.clear();
       return;
     }
-    if (
-      delegationsDataResponse.isSuccess &&
-      delegationsDataResponse.data &&
-      batchResponse !== undefined
-    ) {
-      const resultsArr = batchResponse.result.results;
-      const count = batchResponse.result.count;
-      const total = batchResponse.result.totalCount;
-      const list: OAuth2Delegation[] = [];
-      for (let i = 0; i < count; i++) {
-        list.push(resultsArr[i].result as OAuth2Delegation);
+
+    if (delegationsResponse.isSuccess && delegationsResponse.data && data) {
+      const listResult = data.result.results;
+      const totalCount = data.result.totalCount;
+      const listSize = data.result.count;
+      const elementsList: OAuth2Delegation[] = [];
+
+      for (let i = 0; i < listSize; i++) {
+        elementsList.push(listResult[i].result as unknown as OAuth2Delegation);
       }
-      setDelegationsList(list);
-      setTotalCount(total);
+
+      setTotalCount(totalCount);
+      setDelegations(elementsList);
       setShowTableRows(true);
     }
-    if (!delegationsDataResponse.isLoading && delegationsDataResponse.isError) {
+
+    if (
+      !delegationsResponse.isLoading &&
+      delegationsResponse.isError &&
+      delegationsResponse.error
+    ) {
       window.location.reload();
     }
-  }, [delegationsDataResponse]);
+  }, [delegationsResponse]);
 
-  useEffect(() => {
-    delegationsDataResponse.refetch();
+  const [selectedElements, setSelectedElements] = React.useState<
+    OAuth2Delegation[]
+  >([]);
+  const [selectedPerPage, setSelectedPerPage] = React.useState(0);
+
+  const clearSelectedElements = () => {
+    setSelectedElements([]);
+  };
+
+  const refreshData = () => {
+    setShowTableRows(false);
+    setTotalCount(0);
+    delegationsResponse.refetch().then(() => {
+      setShowTableRows(true);
+    });
+  };
+
+  const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] =
+    React.useState(true);
+  const [isDeletion, setIsDeletion] = React.useState(false);
+
+  const selectableTable = delegations.filter(isOAuth2DelegationSelectable);
+
+  const updateSelectedDelegations = (
+    items: OAuth2Delegation[],
+    isSelected: boolean
+  ) => {
+    let newSelected: OAuth2Delegation[] = [];
+    if (isSelected) {
+      newSelected = JSON.parse(JSON.stringify(selectedElements));
+      for (const item of items) {
+        if (!selectedElements.find((sel) => sel.cn[0] === item.cn[0])) {
+          newSelected.push(item);
+        }
+      }
+    } else {
+      for (const sel of selectedElements) {
+        let found = false;
+        for (const item of items) {
+          if (sel.cn[0] === item.cn[0]) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          newSelected.push(sel);
+        }
+      }
+    }
+    setSelectedElements(newSelected);
+    setIsDeleteButtonDisabled(newSelected.length === 0);
+  };
+
+  const setDelegationsSelected = (delegation: OAuth2Delegation, isSelecting = true) => {
+    if (isOAuth2DelegationSelectable(delegation)) {
+      updateSelectedDelegations([delegation], isSelecting);
+    }
+  };
+
+  React.useEffect(() => {
+    delegationsResponse.refetch();
   }, []);
 
-  useEffect(() => {
-    if (showTableRows !== !isBatchLoading) {
-      setShowTableRows(!isBatchLoading);
-    }
-  }, [isBatchLoading]);
+  const [showTableRows, setShowTableRows] = React.useState(!isLoading);
 
-  const searchValueData = {
-    searchValue,
-    updateSearchValue: setSearchValue,
+  React.useEffect(() => {
+    if (showTableRows !== !isLoading) {
+      setShowTableRows(!isLoading);
+    }
+  }, [isLoading]);
+
+  const [searchEntry] = useSearchOAuth2DelegationEntriesMutation();
+
+  const submitSearchValue = () => {
+    searchEntry({
+      searchValue: searchValue,
+      apiVersion,
+      sizelimit: 100,
+      startIdx: 0,
+      stopIdx: 200,
+    }).then((result) => {
+      if ("data" in result) {
+        const searchError = result.data?.error as
+          | FetchBaseQueryError
+          | SerializedError;
+
+        if (searchError) {
+          let error = "";
+          if ("error" in searchError) {
+            error = searchError.error || "";
+          } else if ("message" in searchError) {
+            error = searchError.message || "";
+          }
+          dispatch(
+            addAlert({
+              name: "submit-search-value-error",
+              title: error || "Error when searching for OAuth2 delegation rules",
+              variant: "danger",
+            })
+          );
+        } else {
+          const listResult = result.data?.result.results || [];
+          const listSize = result.data?.result.count || 0;
+          const totalCount = result.data?.result.totalCount || 0;
+          const elementsList: OAuth2Delegation[] = [];
+
+          for (let i = 0; i < listSize; i++) {
+            elementsList.push(
+              listResult[i].result as unknown as OAuth2Delegation
+            );
+          }
+
+          setTotalCount(totalCount);
+          setDelegations(elementsList);
+          setShowTableRows(true);
+        }
+        setIsSearchDisabled(false);
+      }
+    });
   };
 
   const paginationData = {
@@ -108,34 +249,72 @@ const OAuth2Delegations = () => {
     perPage,
     updatePage: setPage,
     updatePerPage: setPerPage,
-    updateSelectedPerPage: () => {},
+    updateSelectedPerPage: setSelectedPerPage,
+    updateShownElementsList: setDelegations,
     totalCount,
   };
 
-  const refreshData = () => {
-    setShowTableRows(false);
-    setTotalCount(0);
-    delegationsDataResponse.refetch();
+  const searchValueData = {
+    searchValue,
+    updateSearchValue: setSearchValue,
+    submitSearchValue,
   };
+
+  const bulkSelectorData = {
+    selected: selectedElements,
+    updateSelected: updateSelectedDelegations,
+    selectableTable: selectableTable,
+    nameAttr: "cn",
+  };
+
+  const selectedPerPageData = {
+    selectedPerPage,
+    updateSelectedPerPage: setSelectedPerPage,
+  };
+
+  // Modals
+  const [showAddModal, setShowAddModal] = React.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   const toolbarItems: ToolbarItem[] = [
     {
       key: 0,
       element: (
-        <SearchInputLayout
-          dataCy="delegations-search"
-          name="search"
-          ariaLabel="Search delegations"
-          placeholder="Search delegations"
-          searchValueData={searchValueData}
+        <BulkSelectorPrep
+          list={delegations}
+          shownElementsList={delegations}
+          elementData={bulkSelectorData}
+          buttonsData={{
+            updateIsDeleteButtonDisabled: setIsDeleteButtonDisabled,
+          }}
+          selectedPerPageData={selectedPerPageData}
         />
       ),
     },
     {
       key: 1,
       element: (
+        <SearchInputLayout
+          dataCy="search"
+          name="search"
+          ariaLabel="Search OAuth2 delegation rules"
+          placeholder="Search"
+          searchValueData={searchValueData}
+          isDisabled={isSearchDisabled}
+        />
+      ),
+      toolbarItemVariant: ToolbarItemVariant.label,
+      toolbarItemGap: { default: "gapMd" },
+    },
+    {
+      key: 2,
+      toolbarItemVariant: ToolbarItemVariant.separator,
+    },
+    {
+      key: 3,
+      element: (
         <SecondaryButton
-          dataCy="delegations-button-refresh"
+          dataCy="oauth2-delegations-button-refresh"
           onClickHandler={refreshData}
           isDisabled={!showTableRows}
         >
@@ -144,10 +323,42 @@ const OAuth2Delegations = () => {
       ),
     },
     {
-      key: 2,
+      key: 4,
+      element: (
+        <SecondaryButton
+          dataCy="oauth2-delegations-button-delete"
+          isDisabled={isDeleteButtonDisabled || !showTableRows}
+          onClickHandler={() => setShowDeleteModal(true)}
+        >
+          Delete
+        </SecondaryButton>
+      ),
+    },
+    {
+      key: 5,
+      element: (
+        <SecondaryButton
+          dataCy="oauth2-delegations-button-add"
+          isDisabled={!showTableRows}
+          onClickHandler={() => setShowAddModal(true)}
+        >
+          Add
+        </SecondaryButton>
+      ),
+    },
+    {
+      key: 6,
+      toolbarItemVariant: ToolbarItemVariant.separator,
+    },
+    {
+      key: 7,
+      element: <HelpTextWithIconLayout textContent="Help" />,
+    },
+    {
+      key: 8,
       element: (
         <PaginationLayout
-          list={delegationsList}
+          list={delegations}
           paginationData={paginationData}
           widgetId="pagination-options-menu-top"
           isCompact={true}
@@ -158,39 +369,104 @@ const OAuth2Delegations = () => {
   ];
 
   return (
-    <PageSection>
-      <TitleLayout
-        id="oauth2-delegations-title"
-        headingLevel="h1"
-        text="Delegations"
-      />
-      <OuterScrollContainer>
-        <ToolbarLayout
-          className="pf-v6-u-pt-lg pf-v6-u-pb-md"
-          contentClassName=""
-          toolbarItems={toolbarItems}
+    <div>
+      <PageSection hasBodyWrapper={false}>
+        <TitleLayout
+          id="OAuth2 delegation rules page"
+          headingLevel="h1"
+          text="OAuth2 delegation rules"
         />
-        <InnerScrollContainer>
-          <MainTable
-            tableTitle="Delegations table"
-            shownElementsList={delegationsList}
-            pk="cn"
-            keyNames={["cn", "oauth2delegatesource", "oauth2delegatetarget", "oauth2delegatescope"]}
-            columnNames={["Name", "Source", "Target", "Scope"]}
-            hasCheckboxes={false}
-            pathname="oauth2-delegations"
-            showTableRows={showTableRows}
-            showLink={false}
-          />
-        </InnerScrollContainer>
-      </OuterScrollContainer>
-      <PaginationLayout
-        list={delegationsList}
-        paginationData={paginationData}
-        variant={PaginationVariant.bottom}
-        widgetId="pagination-options-menu-bottom"
+      </PageSection>
+      <PageSection hasBodyWrapper={false} isFilled={false}>
+        <Flex direction={{ default: "column" }}>
+          <FlexItem>
+            <ToolbarLayout toolbarItems={toolbarItems} />
+          </FlexItem>
+          <FlexItem style={{ flex: "0 0 auto" }}>
+            <OuterScrollContainer>
+              <InnerScrollContainer
+                style={{ height: "60vh", overflow: "auto" }}
+              >
+                {error !== undefined && error ? (
+                  <GlobalErrors errors={globalErrors.getAll()} />
+                ) : (
+                  <MainTable
+                    tableTitle="OAuth2 delegation rules table"
+                    shownElementsList={delegations}
+                    pk="cn"
+                    keyNames={[
+                      "cn",
+                      "oauth2delegatesource",
+                      "oauth2delegateservice",
+                      "oauth2enabled",
+                    ]}
+                    columnNames={[
+                      "Name",
+                      "Source",
+                      "Permitted Services",
+                      "Enabled",
+                    ]}
+                    hasCheckboxes={true}
+                    pathname="oauth2-delegations"
+                    showTableRows={showTableRows}
+                    showLink={true}
+                    elementsData={{
+                      isElementSelectable: isOAuth2DelegationSelectable,
+                      selectedElements,
+                      selectableElementsTable: selectableTable,
+                      setElementsSelected: setDelegationsSelected,
+                      clearSelectedElements,
+                    }}
+                    buttonsData={{
+                      updateIsDeleteButtonDisabled: (value: boolean) =>
+                        setIsDeleteButtonDisabled(value),
+                      isDeletion,
+                      updateIsDeletion: (value: boolean) =>
+                        setIsDeletion(value),
+                    }}
+                    paginationData={{
+                      selectedPerPage,
+                      updateSelectedPerPage: setSelectedPerPage,
+                    }}
+                  />
+                )}
+              </InnerScrollContainer>
+            </OuterScrollContainer>
+          </FlexItem>
+          <FlexItem
+            style={{ flex: "0 0 auto", position: "sticky", bottom: 0 }}
+          >
+            <PaginationLayout
+              list={delegations}
+              paginationData={paginationData}
+              variant={PaginationVariant.bottom}
+              widgetId="pagination-options-menu-bottom"
+            />
+          </FlexItem>
+        </Flex>
+      </PageSection>
+      <AddOAuth2DelegationModal
+        isOpen={showAddModal}
+        onCloseModal={() => setShowAddModal(false)}
+        onRefresh={refreshData}
+        title="Add OAuth2 delegation rule"
       />
-    </PageSection>
+      <DeleteOAuth2DelegationModal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        selectedData={{
+          selectedElements,
+          clearSelectedElements,
+        }}
+        buttonsData={{
+          updateIsDeleteButtonDisabled: setIsDeleteButtonDisabled,
+          updateIsDeletion: setIsDeletion,
+        }}
+        columnNames={["Name", "Source", "Permitted Services", "Enabled"]}
+        keyNames={["cn", "oauth2delegatesource", "oauth2delegateservice", "oauth2enabled"]}
+        onRefresh={refreshData}
+      />
+    </div>
   );
 };
 
