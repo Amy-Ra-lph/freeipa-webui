@@ -273,70 +273,35 @@ export const getNavigationRoutes = (
           group: OAuth2ClientsGroupRef,
           title: `${BASE_TITLE} - OAuth2 Clients`,
           path: "oauth2-clients",
-          items: [
-            {
-              label: "OAuth2 client Settings",
-              group: OAuth2ClientsGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "oauth2-clients/:cn",
-            },
-          ],
+          items: [],
         },
         {
           label: "OAuth2 Scopes",
           group: OAuth2ScopesGroupRef,
           title: `${BASE_TITLE} - OAuth2 Scopes`,
           path: "oauth2-scopes",
-          items: [
-            {
-              label: "OAuth2 scope Settings",
-              group: OAuth2ScopesGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "oauth2-scopes/:cn",
-            },
-          ],
+          items: [],
         },
         {
           label: "Workload identities",
           group: OAuth2WorkloadsGroupRef,
           title: `${BASE_TITLE} - Workload identities`,
           path: "oauth2-workloads",
-          items: [
-            {
-              label: "Workload identity Settings",
-              group: OAuth2WorkloadsGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "oauth2-workloads/:cn",
-            },
-          ],
+          items: [],
         },
         {
           label: "Delegation rules",
           group: OAuth2DelegationsGroupRef,
           title: `${BASE_TITLE} - Delegation rules`,
           path: "oauth2-delegations",
-          items: [
-            {
-              label: "Delegation rule Settings",
-              group: OAuth2DelegationsGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "oauth2-delegations/:cn",
-            },
-          ],
+          items: [],
         },
         {
           label: "Trusted vendors",
           group: OAuth2VendorsGroupRef,
           title: `${BASE_TITLE} - Trusted vendors`,
           path: "oauth2-vendors",
-          items: [
-            {
-              label: "Trusted vendor Settings",
-              group: OAuth2VendorsGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "oauth2-vendors/:cn",
-            },
-          ],
+          items: [],
         },
         {
           label: "SPIFFE Entries",
