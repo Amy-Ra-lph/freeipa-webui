@@ -262,20 +262,6 @@ export const getNavigationRoutes = (
       path: "",
       items: [
         {
-          label: "Workloads",
-          group: WorkloadsGroupRef,
-          title: `${BASE_TITLE} - Workloads`,
-          path: "workloads",
-          items: [
-            {
-              label: "Workloads Settings",
-              group: WorkloadsGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "workloads/:cn",
-            },
-          ],
-        },
-        {
           label: "OAuth2 Clients",
           group: OAuth2ClientsGroupRef,
           title: `${BASE_TITLE} - OAuth2 Clients`,
@@ -315,14 +301,7 @@ export const getNavigationRoutes = (
           group: SpiffeEntriesGroupRef,
           title: `${BASE_TITLE} - SPIFFE Entries`,
           path: "spiffe-entries",
-          items: [
-            {
-              label: "SPIFFE Entries Settings",
-              group: SpiffeEntriesGroupRef,
-              title: `${BASE_TITLE} - Settings`,
-              path: "spiffe-entries/:cn",
-            },
-          ],
+          items: [],
         },
       ],
     },

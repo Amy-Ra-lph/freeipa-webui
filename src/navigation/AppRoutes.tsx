@@ -767,15 +767,6 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
               <Route path="topology-replicas">
                 <Route path="" element={<TopologyReplicas />} />
               </Route>
-              <Route path="workloads">
-                <Route path="" element={<Workloads />} />
-                <Route path=":cn">
-                  <Route
-                    path=""
-                    element={<WorkloadsTabs section="settings" />}
-                  />
-                </Route>
-              </Route>
               <Route path="oauth2-clients">
                 <Route path="" element={<OAuth2Clients />} />
                 <Route path=":cn">
