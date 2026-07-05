@@ -27,7 +27,12 @@ import {
   EdgeStyle,
 } from "@patternfly/react-topology";
 // PatternFly icons
-import { ServerIcon, TableIcon, TopologyIcon } from "@patternfly/react-icons";
+import {
+  ArrowsAltHIcon,
+  ServerIcon,
+  TableIcon,
+  TopologyIcon,
+} from "@patternfly/react-icons";
 // PatternFly table
 import {
   InnerScrollContainer,
@@ -56,6 +61,12 @@ import TopologyVisualization from "src/components/TopologyVisualization/Topology
 // Modals
 import AddTopologySegmentModal from "src/components/modals/TopologySegmentModals/AddTopologySegmentModal";
 import DeleteTopologySegmentsModal from "src/components/modals/TopologySegmentModals/DeleteTopologySegmentsModal";
+// Topology comparison
+import TopologyComparisonPanel from "src/components/TopologyVisualization/TopologyComparisonPanel";
+import TopologyDeltaSummary from "src/components/TopologyVisualization/TopologyDeltaSummary";
+import ProposedSegmentControls from "src/components/TopologyVisualization/ProposedSegmentControls";
+import useTopologyComparison from "src/hooks/useTopologyComparison";
+import "src/components/TopologyVisualization/TopologyComparison.css";
 // Hooks
 import { addAlert } from "src/store/Global/alerts-slice";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
@@ -79,7 +90,11 @@ import {
   FailureSimResult,
 } from "src/utils/topologyAnalysis";
 // RPC client
-import { useSearchTopologySegmentsEntriesMutation } from "src/services/rpcTopologySegments";
+import {
+  useSearchTopologySegmentsEntriesMutation,
+  useAddTopologySegmentMutation,
+  useDeleteTopologySegmentsMutation,
+} from "src/services/rpcTopologySegments";
 // Errors
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { SerializedError } from "@reduxjs/toolkit";
@@ -117,12 +132,20 @@ const TopologySegments = () => {
   const [selectedSuffix, setSelectedSuffix] = useState(DEFAULT_SUFFIX);
   const [isSuffixOpen, setIsSuffixOpen] = useState(false);
 
-  // View toggle state: table (default) or graph
-  const [viewMode, setViewMode] = useState<"table" | "graph">("table");
+  // View toggle state: table (default), graph, or compare
+  const [viewMode, setViewMode] = useState<"table" | "graph" | "compare">(
+    "table"
+  );
 
   // Failure simulation state
   const [simulateServer, setSimulateServer] = useState<string | null>(null);
   const [isSimSelectorOpen, setIsSimSelectorOpen] = useState(false);
+
+  // Topology comparison state
+  const comparison = useTopologyComparison();
+  const [addSegmentMutation] = useAddTopologySegmentMutation();
+  const [deleteSegmentsMutation] = useDeleteTopologySegmentsMutation();
+  const [isApplying, setIsApplying] = useState(false);
 
   // Search / data loading via mutation (segments require suffixCn)
   const [searchSegments, searchResult] =
@@ -219,6 +242,87 @@ const TopologySegments = () => {
       selectedSuffix
     );
   }, [servers, filteredGraphSegments, simulateServer, selectedSuffix]);
+
+  // Proposed topology for compare mode
+  const proposedSegments = useMemo(
+    () => comparison.getProposedSegments(filteredGraphSegments),
+    [comparison, filteredGraphSegments]
+  );
+
+  const proposedAnalysis = useMemo(
+    () => computeTopologyAnalysis(servers, proposedSegments, selectedSuffix),
+    [servers, proposedSegments, selectedSuffix]
+  );
+
+  const proposedHealth = useMemo(
+    () => computeHealthScore(servers, proposedSegments, selectedSuffix),
+    [servers, proposedSegments, selectedSuffix]
+  );
+
+  const proposedPattern = useMemo(
+    () => classifyTopologyPattern(servers, proposedSegments, selectedSuffix),
+    [servers, proposedSegments, selectedSuffix]
+  );
+
+  const proposedEdges: EdgeModel[] = useMemo(
+    () =>
+      proposedSegments.map((seg) => ({
+        id: `edge-${seg.iparepltoposegmentleftnode}-${seg.iparepltoposegmentrightnode}`,
+        type: "edge",
+        source: `node-${seg.iparepltoposegmentleftnode}`,
+        target: `node-${seg.iparepltoposegmentrightnode}`,
+        edgeStyle: EdgeStyle.default,
+        data: { suffixType: seg.suffixType, segmentCN: seg.cn },
+      })),
+    [proposedSegments]
+  );
+
+  // Apply proposed changes: add new segments, delete removed ones
+  const applyChanges = async () => {
+    setIsApplying(true);
+    try {
+      for (const addition of comparison.additions) {
+        const cn = `${addition.leftNode}-to-${addition.rightNode}`;
+        await addSegmentMutation({
+          suffixCn: selectedSuffix,
+          cn,
+          iparepltoposegmentleftnode: addition.leftNode,
+          iparepltoposegmentrightnode: addition.rightNode,
+          iparepltoposegmentdirection: addition.direction,
+        }).unwrap();
+      }
+      if (comparison.removals.length > 0) {
+        const segsToDelete = filteredGraphSegments.filter((seg) =>
+          comparison.removals.includes(seg.cn)
+        );
+        if (segsToDelete.length > 0) {
+          await deleteSegmentsMutation({
+            suffixCn: selectedSuffix,
+            segments: segsToDelete,
+          }).unwrap();
+        }
+      }
+      dispatch(
+        addAlert({
+          name: "topology-changes-applied",
+          title: "Topology changes applied successfully",
+          variant: "success",
+        })
+      );
+      comparison.reset();
+      refetchGraph();
+      fetchSegments("");
+    } catch {
+      dispatch(
+        addAlert({
+          name: "topology-changes-error",
+          title: "Error applying topology changes",
+          variant: "danger",
+        })
+      );
+    }
+    setIsApplying(false);
+  };
 
   // Fetch segments for the selected suffix
   const fetchSegments = useCallback(
@@ -606,6 +710,18 @@ const TopologySegments = () => {
                     onChange={() => setViewMode("graph")}
                     data-cy="topology-segments-view-graph"
                   />
+                  <ToggleGroupItem
+                    icon={<ArrowsAltHIcon />}
+                    text="Compare"
+                    aria-label="Compare view"
+                    buttonId="toggle-compare"
+                    isSelected={viewMode === "compare"}
+                    onChange={() => {
+                      comparison.reset();
+                      setViewMode("compare");
+                    }}
+                    data-cy="topology-segments-view-compare"
+                  />
                 </ToggleGroup>
               </FlexItem>
               <FlexItem>
@@ -944,6 +1060,88 @@ const TopologySegments = () => {
                       in the {selectedSuffix} suffix topology.
                     </CardBody>
                   </Card>
+                </FlexItem>
+              )}
+            </>
+          )}
+          {/* ===== COMPARE MODE ===== */}
+          {viewMode === "compare" && (
+            <>
+              {/* Delta summary */}
+              {comparison.hasChanges && (
+                <FlexItem>
+                  <TopologyDeltaSummary
+                    currentHealth={healthScore}
+                    proposedHealth={proposedHealth}
+                    currentPattern={topologyPattern}
+                    proposedPattern={proposedPattern}
+                    currentAnalysis={topologyAnalysis}
+                    proposedAnalysis={proposedAnalysis}
+                    additions={comparison.additions}
+                    removals={comparison.removals}
+                  />
+                </FlexItem>
+              )}
+
+              {/* Side-by-side panels */}
+              <FlexItem>
+                <div className="topology-comparison-container">
+                  <TopologyComparisonPanel
+                    label="Current"
+                    nodes={graphNodes}
+                    edges={graphEdges}
+                    healthScore={healthScore}
+                    pattern={topologyPattern}
+                    analysis={topologyAnalysis}
+                  />
+                  <TopologyComparisonPanel
+                    label="Proposed"
+                    nodes={graphNodes}
+                    edges={proposedEdges}
+                    healthScore={proposedHealth}
+                    pattern={proposedPattern}
+                    analysis={proposedAnalysis}
+                  />
+                </div>
+              </FlexItem>
+
+              {/* Segment controls */}
+              <FlexItem>
+                <ProposedSegmentControls
+                  servers={servers}
+                  currentSegments={filteredGraphSegments}
+                  additions={comparison.additions}
+                  removals={comparison.removals}
+                  onAddSegment={comparison.addSegment}
+                  onRemoveSegment={comparison.removeSegment}
+                  onUndoAdd={comparison.undoAdd}
+                  onUndoRemoval={comparison.undoRemoval}
+                />
+              </FlexItem>
+
+              {/* Action buttons */}
+              {comparison.hasChanges && (
+                <FlexItem>
+                  <Flex spaceItems={{ default: "spaceItemsMd" }}>
+                    <FlexItem>
+                      <SecondaryButton
+                        onClickHandler={applyChanges}
+                        isDisabled={isApplying}
+                        dataCy="topology-compare-apply"
+                      >
+                        {isApplying ? "Applying..." : "Apply Changes"}
+                      </SecondaryButton>
+                    </FlexItem>
+                    <FlexItem>
+                      <SecondaryButton
+                        onClickHandler={() => comparison.reset()}
+                        isDisabled={isApplying}
+                        dataCy="topology-compare-discard"
+                      >
+                        Discard
+                      </SecondaryButton>
+                    </FlexItem>
+                  </Flex>
                 </FlexItem>
               )}
             </>

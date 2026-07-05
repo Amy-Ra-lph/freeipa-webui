@@ -119,6 +119,8 @@ import OAuth2DelegationsTabs from "src/pages/OAuth2Delegations/OAuth2Delegations
 import OAuth2Vendors from "src/pages/OAuth2Vendors/OAuth2Vendors";
 import OAuth2VendorsTabs from "src/pages/OAuth2Vendors/OAuth2VendorsTabs";
 import SpiffeEntries from "src/pages/SpiffeEntries/SpiffeEntries";
+import SpiffeEntriesTabs from "src/pages/SpiffeEntries/SpiffeEntriesTabs";
+import WorkloadsTabs from "src/pages/Workloads/WorkloadsTabs";
 import TopologyNodes from "src/pages/TopologyNodes/TopologyNodes";
 import TopologyReplicas from "src/pages/TopologyReplicas/TopologyReplicas";
 
@@ -767,6 +769,12 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
               </Route>
               <Route path="workloads">
                 <Route path="" element={<Workloads />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<WorkloadsTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="oauth2-clients">
                 <Route path="" element={<OAuth2Clients />} />
@@ -815,6 +823,12 @@ export const AppRoutes = ({ isInitialDataLoaded }): React.ReactElement => {
               </Route>
               <Route path="spiffe-entries">
                 <Route path="" element={<SpiffeEntries />} />
+                <Route path=":cn">
+                  <Route
+                    path=""
+                    element={<SpiffeEntriesTabs section="settings" />}
+                  />
+                </Route>
               </Route>
               <Route path="realm-domains">
                 <Route path="" element={<RealmDomains />} />
