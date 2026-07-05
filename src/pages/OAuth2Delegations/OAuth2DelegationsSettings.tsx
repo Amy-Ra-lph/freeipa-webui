@@ -55,6 +55,7 @@ import {
 } from "src/services/rpcOAuth2";
 // Components
 import IpaTextInput from "src/components/Form/IpaTextInput/IpaTextInput";
+import IpaCheckbox from "src/components/Form/IpaCheckbox";
 import TabLayout from "src/components/layouts/TabLayout";
 import SecondaryButton from "src/components/layouts/SecondaryButton";
 import HelpTextWithIconLayout from "src/components/layouts/HelpTextWithIconLayout";
@@ -252,14 +253,18 @@ const OAuth2DelegationsSettings = (props: PropsToSettings) => {
                   />
                 </FormGroup>
                 <FormGroup label="Enabled" fieldId="oauth2enabled">
-                  <IpaTextInput
-                    dataCy="oauth2-delegations-tab-settings-textbox-oauth2enabled"
+                  <IpaCheckbox
+                    dataCy="oauth2-delegations-tab-settings-checkbox-oauth2enabled"
                     name={"oauth2enabled"}
+                    value={"oauth2enabled"}
+                    text={"Enabled"}
                     ariaLabel={"Enabled"}
                     ipaObject={ipaObject}
                     onChange={recordOnChange}
                     objectName="oauth2delegation"
                     metadata={props.metadata}
+                    altTrue="on"
+                    altFalse="off"
                   />
                 </FormGroup>
                 <FormGroup label="Description" fieldId="description">
