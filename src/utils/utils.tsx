@@ -41,6 +41,7 @@ import {
   Location,
   TopologySuffix,
   TopologySegment,
+  OAuth2Delegation,
 } from "./datatypes/globalDataTypes";
 // Errors
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
@@ -253,6 +254,9 @@ export const isOtpTokenSelectable = (otpToken: OtpToken) =>
 
 export const isSelinuxUserMapSelectable = (map: SELinuxUserMap) =>
   map.cn !== "";
+
+export const isOAuth2DelegationSelectable = (delegation: OAuth2Delegation) =>
+  delegation.cn !== "";
 
 export const isPrivilegeSelectable = (privilege: Privilege) =>
   privilege.cn !== "";

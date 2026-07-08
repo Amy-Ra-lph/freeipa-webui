@@ -126,6 +126,24 @@ const extendedApi = api.injectEndpoints({
         return getBatchCommand(delegationsToDeletePayload, API_VERSION_BACKUP);
       },
     }),
+    enableDelegations: build.mutation<BatchRPCResponse, string[]>({
+      query: (ids) => {
+        const commands: Command[] = ids.map((id) => ({
+          method: "oauth2delegation_mod",
+          params: [[id], { oauth2enabled: true }],
+        }));
+        return getBatchCommand(commands, API_VERSION_BACKUP);
+      },
+    }),
+    disableDelegations: build.mutation<BatchRPCResponse, string[]>({
+      query: (ids) => {
+        const commands: Command[] = ids.map((id) => ({
+          method: "oauth2delegation_mod",
+          params: [[id], { oauth2enabled: false }],
+        }));
+        return getBatchCommand(commands, API_VERSION_BACKUP);
+      },
+    }),
 
     // OAuth2Client endpoints
     getClientFullData: build.query<ClientFullData, string>({
@@ -360,6 +378,8 @@ export const {
   useAddDelegationMutation,
   useSaveDelegationMutation,
   useRemoveDelegationsMutation,
+  useEnableDelegationsMutation,
+  useDisableDelegationsMutation,
   useGetClientFullDataQuery,
   useAddClientMutation,
   useSaveClientMutation,

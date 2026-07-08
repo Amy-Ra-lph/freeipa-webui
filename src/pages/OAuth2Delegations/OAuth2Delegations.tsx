@@ -16,12 +16,14 @@ import BulkSelectorPrep from "src/components/BulkSelectorPrep";
 import useUpdateRoute from "src/hooks/useUpdateRoute";
 import useListPageSearchParams from "src/hooks/useListPageSearchParams";
 import { useAppSelector } from "src/store/hooks";
-import { API_VERSION_BACKUP } from "src/utils/utils";
+import { API_VERSION_BACKUP, isOAuth2DelegationSelectable } from "src/utils/utils";
 import { GenericPayload } from "src/services/rpc";
 import { useGettingOAuth2DelegationsQuery } from "src/services/rpcOAuth2";
 import { OAuth2Delegation } from "src/utils/datatypes/globalDataTypes";
+import { apiToOAuth2Delegation } from "src/utils/oauth2Utils";
 import AddOAuth2Delegation from "src/components/modals/OAuth2Modals/AddOAuth2Delegation";
 import DeleteOAuth2Delegations from "src/components/modals/OAuth2Modals/DeleteOAuth2Delegations";
+import DisableEnableOAuth2Delegations from "src/components/modals/OAuth2Modals/DisableEnableOAuth2Delegations";
 
 const OAuth2Delegations = () => {
   const [delegationsList, setDelegationsList] = useState<OAuth2Delegation[]>([]);
@@ -43,6 +45,8 @@ const OAuth2Delegations = () => {
   const [selectedDelegations, setSelectedDelegations] = useState<OAuth2Delegation[]>([]);
   const [selectedPerPage, setSelectedPerPage] = useState<number>(0);
   const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState<boolean>(true);
+  const [isEnableButtonDisabled, setIsEnableButtonDisabled] = useState<boolean>(true);
+  const [isDisableButtonDisabled, setIsDisableButtonDisabled] = useState<boolean>(true);
   const [isDeletion, setIsDeletion] = useState(false);
 
   const firstIdx = (page - 1) * perPage;
@@ -77,7 +81,7 @@ const OAuth2Delegations = () => {
       const total = batchResponse.result.totalCount;
       const list: OAuth2Delegation[] = [];
       for (let i = 0; i < count; i++) {
-        list.push(resultsArr[i].result as OAuth2Delegation);
+        list.push(apiToOAuth2Delegation(resultsArr[i].result));
       }
       setDelegationsList(list);
       setTotalCount(total);
@@ -109,6 +113,10 @@ const OAuth2Delegations = () => {
     delegationsDataResponse.refetch();
   };
 
+  const selectableDelegationsTable = delegationsList.filter(
+    isOAuth2DelegationSelectable
+  );
+
   const updateSelectedDelegations = (delegations: OAuth2Delegation[], isSelected: boolean) => {
     let newSelected: OAuth2Delegation[] = [];
     if (isSelected) {
@@ -116,7 +124,7 @@ const OAuth2Delegations = () => {
       for (let i = 0; i < delegations.length; i++) {
         if (
           selectedDelegations.find(
-            (sel) => sel.cn[0] === delegations[i].cn[0]
+            (sel) => sel.cn === delegations[i].cn
           )
         ) {
           continue;
@@ -127,7 +135,7 @@ const OAuth2Delegations = () => {
       for (let i = 0; i < selectedDelegations.length; i++) {
         let found = false;
         for (let ii = 0; ii < delegations.length; ii++) {
-          if (selectedDelegations[i].cn[0] === delegations[ii].cn[0]) {
+          if (selectedDelegations[i].cn === delegations[ii].cn) {
             found = true;
             break;
           }
@@ -141,20 +149,16 @@ const OAuth2Delegations = () => {
     setIsDeleteButtonDisabled(newSelected.length === 0);
   };
 
-  const updateIsDeleteButtonDisabled = (value: boolean) => {
-    setIsDeleteButtonDisabled(value);
-  };
-
-  const updateIsDeletion = (value: boolean) => {
-    setIsDeletion(value);
-  };
-
-  const updateSelectedPerPage = (selected: number) => {
-    setSelectedPerPage(selected);
+  const setDelegationSelected = (delegation: OAuth2Delegation, isSelecting = true) => {
+    if (isOAuth2DelegationSelectable(delegation)) {
+      updateSelectedDelegations([delegation], isSelecting);
+    }
   };
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEnableDisableModal, setShowEnableDisableModal] = useState(false);
+  const [operation, setOperation] = useState<"enable" | "disable">("disable");
 
   const onAddClickHandler = () => {
     setShowAddModal(true);
@@ -176,25 +180,31 @@ const OAuth2Delegations = () => {
     setShowDeleteModal(!showDeleteModal);
   };
 
+  const onEnableOperation = () => {
+    setOperation("enable");
+    setShowEnableDisableModal(true);
+  };
+
+  const onDisableOperation = () => {
+    setOperation("disable");
+    setShowEnableDisableModal(true);
+  };
+
   const delegationsBulkSelectorData = {
     selected: selectedDelegations,
     updateSelected: updateSelectedDelegations,
-    selectableTable: delegationsList,
+    selectableTable: selectableDelegationsTable,
     nameAttr: "cn",
-  };
-
-  const buttonsData = {
-    updateIsDeleteButtonDisabled,
   };
 
   const selectedPerPageData = {
     selectedPerPage,
-    updateSelectedPerPage,
+    updateSelectedPerPage: setSelectedPerPage,
   };
 
   const deleteDelegationsButtonsData = {
-    updateIsDeleteButtonDisabled,
-    updateIsDeletion,
+    updateIsDeleteButtonDisabled: setIsDeleteButtonDisabled,
+    updateIsDeletion: setIsDeletion,
   };
 
   const selectedDelegationsData = {
@@ -212,9 +222,12 @@ const OAuth2Delegations = () => {
     perPage,
     updatePage: setPage,
     updatePerPage: setPerPage,
-    updateSelectedPerPage,
+    updateSelectedPerPage: setSelectedPerPage,
     totalCount,
   };
+
+  const columnNames = ["Name", "Status", "Source", "Target", "Scope"];
+  const keyNames = ["cn", "oauth2enabled", "oauth2delegatesource", "oauth2delegatetarget", "oauth2delegatescope"];
 
   const toolbarItems: ToolbarItem[] = [
     {
@@ -224,7 +237,9 @@ const OAuth2Delegations = () => {
           list={delegationsList}
           shownElementsList={delegationsList}
           elementData={delegationsBulkSelectorData}
-          buttonsData={buttonsData}
+          buttonsData={{
+            updateIsDeleteButtonDisabled: setIsDeleteButtonDisabled,
+          }}
           selectedPerPageData={selectedPerPageData}
         />
       ),
@@ -285,10 +300,34 @@ const OAuth2Delegations = () => {
     },
     {
       key: 6,
-      toolbarItemVariant: ToolbarItemVariant.separator,
+      element: (
+        <SecondaryButton
+          isDisabled={isDisableButtonDisabled || !showTableRows}
+          onClickHandler={onDisableOperation}
+          dataCy="delegations-button-disable"
+        >
+          Disable
+        </SecondaryButton>
+      ),
     },
     {
       key: 7,
+      element: (
+        <SecondaryButton
+          isDisabled={isEnableButtonDisabled || !showTableRows}
+          onClickHandler={onEnableOperation}
+          dataCy="delegations-button-enable"
+        >
+          Enable
+        </SecondaryButton>
+      ),
+    },
+    {
+      key: 8,
+      toolbarItemVariant: ToolbarItemVariant.separator,
+    },
+    {
+      key: 9,
       element: (
         <PaginationLayout
           list={delegationsList}
@@ -322,12 +361,32 @@ const OAuth2Delegations = () => {
                   tableTitle="Delegations table"
                   shownElementsList={delegationsList}
                   pk="cn"
-                  keyNames={["cn", "oauth2delegatesource", "oauth2delegatetarget", "oauth2delegatescope"]}
-                  columnNames={["Name", "Source", "Target", "Scope"]}
+                  keyNames={keyNames}
+                  columnNames={columnNames}
                   hasCheckboxes={true}
                   pathname="oauth2-delegations"
                   showTableRows={showTableRows}
                   showLink={true}
+                  elementsData={{
+                    isElementSelectable: isOAuth2DelegationSelectable,
+                    selectedElements: selectedDelegations,
+                    selectableElementsTable: selectableDelegationsTable,
+                    setElementsSelected: setDelegationSelected,
+                    clearSelectedElements: clearSelectedDelegations,
+                  }}
+                  buttonsData={{
+                    updateIsDeleteButtonDisabled: setIsDeleteButtonDisabled,
+                    isDeletion,
+                    updateIsDeletion: setIsDeletion,
+                    updateIsEnableButtonDisabled: setIsEnableButtonDisabled,
+                    updateIsDisableButtonDisabled: setIsDisableButtonDisabled,
+                    isDisableEnableOp: true,
+                  }}
+                  paginationData={{
+                    selectedPerPage,
+                    updateSelectedPerPage: setSelectedPerPage,
+                  }}
+                  statusElementName="oauth2enabled"
                 />
               </InnerScrollContainer>
             </OuterScrollContainer>
@@ -354,6 +413,16 @@ const OAuth2Delegations = () => {
         handleModalToggle={onDeleteModalToggle}
         selectedDelegationsData={selectedDelegationsData}
         buttonsData={deleteDelegationsButtonsData}
+        onRefresh={refreshData}
+      />
+      <DisableEnableOAuth2Delegations
+        isOpen={showEnableDisableModal}
+        onClose={() => setShowEnableDisableModal(false)}
+        elementsList={selectedDelegations.map((d) => d.cn)}
+        setElementsList={(newList: OAuth2Delegation[]) =>
+          setSelectedDelegations(newList)
+        }
+        operation={operation}
         onRefresh={refreshData}
       />
     </div>
